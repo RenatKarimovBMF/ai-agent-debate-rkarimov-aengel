@@ -31,28 +31,29 @@ class ProAgent(BaseAgent):
             max_words=d.max_words_per_turn,
         )
 
-    def build_turn(self, ping: int, opponent_text: str | None) -> DebateMessage:
-        prompt = _turn_prompt(
-            ping=ping,
-            own_side=self.config.debate.pro_side,
-            opponent_side=self.config.debate.con_side,
-            opponent_text=opponent_text,
-        )
-        raw = self.invoke_llm(prompt)
-        payload = _parse_debate_payload(
-            raw,
-            ping,
-            responding_to_ping=ping if opponent_text else None,
-        )
+def build_turn(self, ping: int, opponent_text: str | None) -> DebateMessage:
+    prompt = _turn_prompt(
+        ping=ping,
+        own_side=self.config.debate.pro_side,
+        opponent_side=self.config.debate.con_side,
+        opponent_text=opponent_text,
+    )
 
-        return DebateMessage(
-            type=MessageType.TURN,
-            from_role=AgentRole.PRO,
-            to_role=AgentRole.PARENT,
-            session_id=self.session_id,
-            turn_id=self.next_turn_id(),
-            payload=payload,
-        )
+    payload = _invoke_and_parse_debate_payload_with_retry(
+        agent=self,
+        prompt=prompt,
+        ping=ping,
+        responding_to_ping=ping if opponent_text else None,
+    )
+
+    return DebateMessage(
+        type=MessageType.TURN,
+        from_role=AgentRole.PRO,
+        to_role=AgentRole.PARENT,
+        session_id=self.session_id,
+        turn_id=self.next_turn_id(),
+        payload=payload,
+    )
 
 
 class ConAgent(BaseAgent):
@@ -235,11 +236,39 @@ def _turn_prompt(
 
 
 def _extract_json(text: str) -> dict:
-    match = re.search(r"\{[\s\S]*\}", text)
-    if not match:
-        raise ValueError("No JSON object in model output")
+    """Extract the first valid JSON object from an LLM response.
 
-    return json.loads(match.group())
+    LLMs sometimes return:
+    - ```json fenced blocks
+    - text before/after JSON
+    - several JSON-looking snippets
+    - citations with braces inside text
+
+    This function scans balanced braces and returns the first parseable object.
+    """
+
+    cleaned = text.strip()
+
+    # Remove common markdown fences if the model ignored instructions.
+    cleaned = re.sub(r"^```json\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"^```\s*", "", cleaned)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+
+    decoder = json.JSONDecoder()
+
+    for start_index, char in enumerate(cleaned):
+        if char != "{":
+            continue
+
+        try:
+            obj, _end_index = decoder.raw_decode(cleaned[start_index:])
+        except json.JSONDecodeError:
+            continue
+
+        if isinstance(obj, dict):
+            return obj
+
+    raise ValueError(f"No valid JSON object in model output. Raw output was:\n{cleaned[:1200]}")
 
 
 def _parse_debate_payload(
