@@ -6,7 +6,7 @@ language = "en"
 
 # The exercise prefers 10, but allows reducing to 5 when API budget is limited,
 # if you explicitly document this in README.
-pings_per_side = 5
+pings_per_side = 10
 
 max_words_per_turn = 280
 request_timeout_seconds = 120
