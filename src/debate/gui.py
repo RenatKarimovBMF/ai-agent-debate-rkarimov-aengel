@@ -19,7 +19,7 @@ from tkinter import messagebox, scrolledtext
 
 from debate.config import load_config, with_custom_debate
 from debate.env_loader import ensure_env_loaded, gemini_key_hint
-from debate.orchestrator import DebateOrchestrator
+from debate.process_orchestrator import ProcessDebateOrchestrator
 from sdk.llm_client import LlmClient
 
 BG = "#0f0f1a"
