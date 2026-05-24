@@ -306,7 +306,7 @@ class DebateGui(tk.Tk):
         self._log(f"Question: {topic}")
         self._log(f"PRO: {pro}")
         self._log(f"CON: {con}")
-        self._log("Please wait. Each agent turn calls the LLM/API.")
+        self._log("Live process logs will appear below: supervisor → parent → pro/con → parent.")
 
         def worker() -> None:
             try:
@@ -314,7 +314,7 @@ class DebateGui(tk.Tk):
                 base = load_config()
                 config = with_custom_debate(base, pro_side=pro, con_side=con, topic=topic)
 
-                orch = DebateOrchestrator(config, progress_callback=self._queue_log)
+                orch = ProcessDebateOrchestrator(config, progress_callback=self._queue_log)
                 orch.start_watchdogs()
 
                 try:
