@@ -91,6 +91,27 @@ pings_per_side = 5
 
 Document that here — **no grade penalty** per course instructions.
 
+## Full mode and budget demo mode
+
+The default `config.toml` uses `pings_per_side = 10`, which matches the full exercise requirement.
+
+Because the system uses real LLM calls with web grounding, a full debate can require many API calls:
+
+- 10 Pro turns
+- 10 Con turns
+- 1 Parent/Judge verdict
+- possible JSON repair calls
+- possible retry calls after rate limits
+
+On free Gemini quota this can trigger HTTP 429 rate-limit errors.
+
+For demonstration under a limited free API quota, the repository also includes `config.demo.toml`, which uses `pings_per_side = 5`. This follows the assignment note allowing a reduction from 10 to 5 pings when budget is limited.
+
+Run full mode:
+
+```bash
+python -m debate.main
+
 ## Project layout
 
 ```
