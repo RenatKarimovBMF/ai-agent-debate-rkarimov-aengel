@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,14 +11,16 @@ from debate.config import LoggingConfig
 
 
 class RotatingJsonlHandler(logging.Handler):
-    """Structured logs: up to N files, M lines each (config.toml)."""
+    """Structured JSONL logs: up to N files, M lines each."""
 
     def __init__(self, config: LoggingConfig, base_name: str = "debate") -> None:
         super().__init__()
+
         self._config = config
-        self._base_name = base_name
+        self._base_name = f"{base_name}_pid{os.getpid()}"
         self._log_dir = Path(config.log_dir)
         self._log_dir.mkdir(parents=True, exist_ok=True)
+
         self._file_index = 0
         self._line_count = 0
         self._current_path = self._next_path()
@@ -40,6 +43,7 @@ class RotatingJsonlHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         entry = {
             "ts": datetime.now(timezone.utc).isoformat(),
+            "pid": os.getpid(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -50,20 +54,19 @@ class RotatingJsonlHandler(logging.Handler):
 
         self._file.write(json.dumps(entry, ensure_ascii=False) + "\n")
         self._file.flush()
+
         self._line_count += 1
         self._rotate_if_needed()
 
     def close(self) -> None:
-        self._file.close()
-        super().close()
+        try:
+            self._file.close()
+        finally:
+            super().close()
 
 
 def setup_logging(config: LoggingConfig) -> logging.Logger:
-    """
-    Configure both:
-    1. JSONL logs in logs/debate_000.jsonl
-    2. Human-readable terminal logs while the debate is running
-    """
+    """Configure both JSONL file logs and readable terminal logs."""
 
     logger = logging.getLogger("debate")
     logger.setLevel(getattr(logging, config.level.upper(), logging.INFO))
@@ -82,7 +85,10 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
         console_handler._debate_console = True  # type: ignore[attr-defined]
         console_handler.setLevel(getattr(logging, config.level.upper(), logging.INFO))
         console_handler.setFormatter(
-            logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s", "%H:%M:%S")
+            logging.Formatter(
+                "[%(asctime)s] pid=%(process)d %(levelname)s: %(message)s",
+                "%H:%M:%S",
+            )
         )
         logger.addHandler(console_handler)
 
