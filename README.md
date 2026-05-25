@@ -46,7 +46,7 @@ python -m debate.gui
 python -m debate.main --gui
 ```
 
-The window lets you set **Side A vs Side B** and the **debate question**, then runs the same orchestrator as the terminal. Default values are Godfather vs Shawshank. Add screenshots of the GUI to `docs/screenshots/` for the README.
+The window lets you set **Side A vs Side B** and the **debate question**, then runs the same orchestrator as the terminal. Default values are Godfather vs Shawshank. Add screenshots of the GUI to `assets/screenshots/` for the README.
 
 **You must still demonstrate** `python -m debate.main` from the terminal for the grader.
 
@@ -116,14 +116,17 @@ python -m debate.main
 
 ```
 ai-agent-debate-karimov-engel/
-├── config.toml              # All parameters (no hardcoding)
+├── config.toml              # Runtime config (JSON scaffold in config/)
+├── config/                  # setup.json, rate_limits.json (Stage 6 target)
 ├── .env.example
 ├── .claude/skills/          # pro / con / parent skills
 ├── .claude/commands/        # optional CLI command
 ├── src/debate/              # orchestrator, agents, IPC, gatekeeper
-├── src/sdk/                 # Claude CLI / API wrapper
-├── docs/architecture.md     # class diagram + flow
-├── tests/
+├── src/sdk/                 # LLM SDK (Gemini / Claude)
+├── docs/                    # PRD, PLAN, TODO, architecture
+├── tests/unit/              # unit tests
+├── tests/integration/       # integration tests
+├── assets/screenshots/      # README screenshots
 ├── fifo/                    # IPC queues (runtime)
 └── logs/                    # JSONL logs + verdict_*.json
 ```
@@ -164,7 +167,7 @@ Do **not** commit `.env` — only `.env.example`.
 ## Pair workflow
 
 1. One shared GitHub repo (both push)  
-2. Run full debate once; save screenshots to `docs/screenshots/`  
+2. Run full debate once; save screenshots to `assets/screenshots/`  
 3. Copy sample `logs/debate_000.jsonl` excerpt into README  
 4. Each partner submits own Moodle PDF pointing to the same GitHub URL  
 

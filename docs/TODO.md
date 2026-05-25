@@ -18,7 +18,7 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | S1-04 | Create `docs/PRD_orchestrator.md` | Alon | [x] |
 | S1-05 | Create `docs/PRD_gatekeeper.md` | Renat | [x] |
 | S1-06 | Create `docs/PRD_llm_sdk.md` | Alon | [x] |
-| S1-07 | User commit + push Stage 1 | Both | [ ] |
+| S1-07 | User commit + push Stage 1 | Both | [x] |
 
 **Commit message (suggested):** `docs: add PRD, PLAN, TODO and mechanism PRDs`
 
@@ -28,11 +28,13 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S2-01 | Add `config/` directory scaffold | Renat | [ ] |
-| S2-02 | Move tests to `tests/unit/` and `tests/integration/` | Alon | [ ] |
-| S2-03 | Add `assets/screenshots/` for README | Renat | [ ] |
-| S2-04 | Update imports and pytest paths | Alon | [ ] |
+| S2-01 | Add `config/` directory scaffold | Renat | [x] |
+| S2-02 | Move tests to `tests/unit/` and `tests/integration/` | Alon | [x] |
+| S2-03 | Add `assets/screenshots/` for README | Renat | [x] |
+| S2-04 | Update imports and pytest paths | Alon | [x] |
 | S2-05 | User commit + push Stage 2 | Both | [ ] |
+
+**Commit message (suggested):** `refactor: add config/assets scaffold and split tests into unit/integration`
 
 ---
 

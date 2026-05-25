@@ -234,20 +234,28 @@ Public agent IPC (Exercise requirement) remains JSON `DebateMessage` / `VerdictM
 
 ## 8. Directory structure
 
-### Current
+### Current (Stage 2)
 
 ```
+config/
+  setup.json
+  demo_setup.json
+  rate_limits.json
+  demo_rate_limits.json
 src/
-  debate/          # Application layer
-  sdk/             # LLM SDK (provider isolation)
-tests/             # pytest (flat)
-docs/              # PRD, PLAN, TODO, architecture
-.claude/skills/    # Per-agent skills
+  debate/
+  sdk/
+tests/
+  unit/
+  integration/
+assets/
+  screenshots/
+docs/
 config.toml
 config.demo.toml
 ```
 
-### Target (after Stages 2–6)
+### Target (after Stages 3–6)
 
 ```
 config/

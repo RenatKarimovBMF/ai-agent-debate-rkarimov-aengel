@@ -1,5 +1,3 @@
-import pytest
-
 from debate.models import (
     AgentRole,
     DebateMessage,

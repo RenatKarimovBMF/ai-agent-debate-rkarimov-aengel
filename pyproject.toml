@@ -42,7 +42,7 @@ only-include = ["src/debate", "src/sdk"]
 "src/sdk" = "sdk"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests/unit", "tests/integration"]
 pythonpath = ["src"]
 
 [tool.ruff]

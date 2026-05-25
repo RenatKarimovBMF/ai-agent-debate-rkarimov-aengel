@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "max_total_requests": 200,
+  "max_requests_per_agent": 80,
+  "min_interval_ms": 0,
+  "log_denials": false
+}
