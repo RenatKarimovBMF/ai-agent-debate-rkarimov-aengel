@@ -1,0 +1,6 @@
+BG = "#0f0f1a"
+PANEL = "#1a1a2e"
+ACCENT = "#c9a227"
+TEXT = "#eaeaea"
+MUTED = "#8a8a9a"
+VS_COLOR = "#e94560"

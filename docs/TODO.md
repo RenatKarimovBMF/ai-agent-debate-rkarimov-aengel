@@ -58,13 +58,13 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S4-01 | Split `agents.py` by role | Renat | [ ] |
-| S4-02 | Split `gui.py` (UI vs controller) | Alon | [ ] |
-| S4-03 | Split or slim `orchestrator.py` (legacy) | Renat | [ ] |
-| S4-04 | Ruff pass on all touched files | Both | [ ] |
+| S4-01 | Split `agents.py` by role | Renat | [x] |
+| S4-02 | Split `gui.py` (UI vs controller) | Alon | [x] |
+| S4-03 | Split legacy orchestrator into `debate/legacy/` | Renat | [x] |
+| S4-04 | Ruff pass on all touched files | Both | [x] |
 | S4-05 | User commit + push Stage 4 | Both | [ ] |
 
-**Files over limit today:** `agents.py` (~454), `gui.py` (~288), `orchestrator.py` (~218)
+**Commit message (suggested):** `refactor: split agents, gui, and legacy orchestrator modules`
 
 ---
 

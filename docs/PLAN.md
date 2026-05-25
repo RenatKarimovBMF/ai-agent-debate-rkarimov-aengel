@@ -234,25 +234,22 @@ Public agent IPC (Exercise requirement) remains JSON `DebateMessage` / `VerdictM
 
 ## 8. Directory structure
 
-### Current (Stage 2)
+### Current (Stage 4)
 
 ```
 config/
-  setup.json
-  demo_setup.json
-  rate_limits.json
-  demo_rate_limits.json
-src/
-  debate/
-  sdk/
-tests/
-  unit/
-  integration/
-assets/
-  screenshots/
+src/debate/
+  orchestrator/     # multiprocess (production)
+  agents/           # pro, con, parent + JSON/LLM helpers
+  gui/              # optional Tkinter launcher
+  legacy/           # single-process reference orchestrator
+  agent_base.py
+  gatekeeper.py
+  ...
+tests/unit/
+tests/integration/
+assets/screenshots/
 docs/
-config.toml
-config.demo.toml
 ```
 
 ### Target (after Stages 3–6)

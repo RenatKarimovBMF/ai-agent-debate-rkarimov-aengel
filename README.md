@@ -122,7 +122,10 @@ ai-agent-debate-karimov-engel/
 ├── .claude/skills/          # pro / con / parent skills
 ├── .claude/commands/        # optional CLI command
 ├── src/debate/              # orchestrator, agents, IPC, gatekeeper
-│   └── orchestrator/        # multiprocess debate (Stage 3 split)
+│   ├── orchestrator/        # multiprocess debate (Stage 3)
+│   ├── agents/              # pro, con, parent agents (Stage 4)
+│   ├── gui/                 # optional Tkinter UI (Stage 4)
+│   └── legacy/              # single-process reference orchestrator
 ├── src/sdk/                 # LLM SDK (Gemini / Claude)
 ├── docs/                    # PRD, PLAN, TODO, architecture
 ├── tests/unit/              # unit tests
