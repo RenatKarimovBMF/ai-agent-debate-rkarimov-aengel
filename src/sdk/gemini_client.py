@@ -38,7 +38,7 @@ class GeminiAgentClient:
             from google import genai
         except ImportError as exc:
             raise RuntimeError(
-                "Package 'google-genai' is not installed. Run: pip install -r requirements.txt"
+                "Package 'google-genai' is not installed. Run: uv sync --extra dev"
             ) from exc
 
         client = genai.Client(api_key=self._api_key)

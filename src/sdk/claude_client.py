@@ -64,7 +64,7 @@ class ClaudeAgentClient:
             import anthropic
         except ImportError as exc:
             raise RuntimeError(
-                "Package 'anthropic' is not installed. Run: pip install -r requirements.txt"
+                "Package 'anthropic' is not installed. Run: uv sync --extra dev"
             ) from exc
 
         api_key = os.environ.get("ANTHROPIC_API_KEY")

@@ -29,15 +29,16 @@ Leave `ANTHROPIC_API_KEY` empty unless you also want Anthropic later.
 ## Step 3 — Install dependencies
 
 ```powershell
-pip install -r requirements.txt
+uv sync --extra dev
 ```
+
+If `uv` is not on PATH: `python -m uv sync --extra dev`
 
 ## Step 4 — Run
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m debate.main --dry-run
-python -m debate.gui
+uv run python -m debate.main --dry-run
+uv run python -m debate.gui
 ```
 
 The app will use **Gemini 2.0 Flash** with **Google Search** for real citations (homework requirement).
@@ -59,7 +60,7 @@ Google says the key in `.env` is no longer valid.
 1. Go to **https://aistudio.google.com/apikey**
 2. **Create API key** (new one)
 3. Replace the line in `.env`: `GEMINI_API_KEY=AIza...` (new value)
-4. **New terminal** → `python -m debate.test_gemini`
+4. **New terminal** → `uv run python -m debate.test_gemini`
 
 Do not reuse an old copied key from chat or email.
 
@@ -73,7 +74,7 @@ Often means:
 4. **Test one call** before full debate:
 
 ```powershell
-python -m debate.test_gemini
+uv run python -m debate.test_gemini
 ```
 
 ## Troubleshooting
@@ -81,6 +82,6 @@ python -m debate.test_gemini
 | Problem | Fix |
 |---------|-----|
 | `GEMINI_API_KEY not set` | Create `.env` from `.env.example` |
-| `google-genai` missing | `pip install google-genai` |
+| `google-genai` missing | `uv sync --extra dev` |
 | Rate limit / quota | Wait 1–2 min; run `test_gemini`; use 5 pings |
 | Region blocked | New key at AI Studio; see lecturer |

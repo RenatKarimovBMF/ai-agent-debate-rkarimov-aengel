@@ -16,8 +16,8 @@
 
 1. Get a key: **https://aistudio.google.com/apikey** (free, no credit card in most regions)
 2. `copy .env.example .env` and set `GEMINI_API_KEY=AIza...` and `LLM_PROVIDER=gemini`
-3. `pip install -r requirements.txt`
-4. `python -m debate.main --dry-run` → should print `LLM provider: gemini`
+3. Install with UV (see **Quick start** below)
+4. `uv run python -m debate.main --dry-run` → should print `LLM provider: gemini`
 
 Full guide: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
 
@@ -40,10 +40,9 @@ Full guide: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
 The assignment **requires** terminal or SDK operation for grading, but **allows** an optional GUI plus screenshots (Exercise 02 §8.6).
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m debate.gui
+uv run python -m debate.gui
 # or
-python -m debate.main --gui
+uv run python -m debate.main --gui
 ```
 
 The window lets you set **Side A vs Side B** and the **debate question**, then runs the same orchestrator as the terminal. Default values are Godfather vs Shawshank. Add screenshots of the GUI to `assets/screenshots/` for the README.
@@ -52,33 +51,32 @@ The window lets you set **Side A vs Side B** and the **debate question**, then r
 
 ## Quick start (UV)
 
+Install [uv](https://docs.astral.sh/uv/) if needed:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+# or: pip install uv
+```
+
+Project setup:
+
 ```powershell
 cd "c:\Users\Ренат\Desktop\Haifa Un\6 is Final\Ai\ai-agent-debate-karimov-engel"
 copy .env.example .env
-# Edit .env — set ANTHROPIC_API_KEY
+# Edit .env — set GEMINI_API_KEY (see docs/GEMINI_SETUP.md)
 
-pip install -r requirements.txt
-```
-
-Or with UV:
-
-```powershell
-uv venv
-uv pip install -e ".[dev]"
-
-uv run pytest
+uv sync --extra dev
 uv run python -m debate.main --dry-run
+uv run pytest
 uv run python -m debate.main
 ```
 
-Without UV:
+If `uv` is not on PATH after pip install, use `python -m uv` instead (e.g. `python -m uv sync --extra dev`).
+
+Demo mode (5 pings, lower API usage):
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install -e ".[dev]"
-$env:PYTHONPATH = "src"
-python -m debate.main --dry-run
+uv run python -m debate.main --config config.demo.toml
 ```
 
 ## Budget note
@@ -109,13 +107,22 @@ For demonstration under a limited free API quota, the repository also includes `
 
 Run full mode:
 
-```bash
-python -m debate.main
+```powershell
+uv run python -m debate.main
+```
+
+Run budget demo mode:
+
+```powershell
+uv run python -m debate.main --config config.demo.toml
+```
 
 ## Project layout
 
 ```
 ai-agent-debate-karimov-engel/
+├── pyproject.toml           # Project metadata + dependencies
+├── uv.lock                  # Locked dependency versions (UV)
 ├── config.toml              # Runtime config (JSON scaffold in config/)
 ├── config/                  # setup.json, rate_limits.json (Stage 6 target)
 ├── .env.example

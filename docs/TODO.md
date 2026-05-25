@@ -72,11 +72,13 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S5-01 | Generate `uv.lock` | Renat | [ ] |
-| S5-02 | Remove `requirements.txt` | Renat | [ ] |
-| S5-03 | Update README for UV-only install | Alon | [ ] |
-| S5-04 | Verify `uv run pytest` and `uv run python -m debate.main --dry-run` | Both | [ ] |
+| S5-01 | Generate `uv.lock` | Renat | [x] |
+| S5-02 | Remove `requirements.txt` | Renat | [x] |
+| S5-03 | Update README for UV-only install | Alon | [x] |
+| S5-04 | Verify `uv run pytest` and `uv run python -m debate.main --dry-run` | Both | [x] |
 | S5-05 | User commit + push Stage 5 | Both | [ ] |
+
+**Commit message (suggested):** `build: migrate to uv with uv.lock and remove requirements.txt`
 
 ---
 
