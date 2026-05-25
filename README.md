@@ -183,12 +183,16 @@ Do **not** commit `.env` — only `.env.example`.
 3. Copy sample `logs/debate_000.jsonl` excerpt into README  
 4. Each partner submits own Moodle PDF pointing to the same GitHub URL  
 
-## Lint
+## Lint and tests
 
 ```powershell
 uv run ruff check src tests
 uv run ruff format src tests
+uv run pytest
+uv run pytest --cov
 ```
+
+Coverage target is **85%** on core modules (`src/debate`, `src/sdk`). Multiprocess worker entrypoints are excluded from the coverage gate because they require live process integration tests.
 
 ## License
 

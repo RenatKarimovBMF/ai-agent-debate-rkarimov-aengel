@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from debate.config import LoggingConfig
@@ -42,7 +42,7 @@ class RotatingJsonlHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:
         entry = {
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
             "pid": os.getpid(),
             "level": record.levelname,
             "logger": record.name,

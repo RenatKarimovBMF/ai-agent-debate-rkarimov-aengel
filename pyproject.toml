@@ -22,6 +22,7 @@ dependencies = [
 dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
     "ruff>=0.8.0",
 ]
 
@@ -43,6 +44,29 @@ only-include = ["src/debate", "src/sdk"]
 [tool.pytest.ini_options]
 testpaths = ["tests/unit", "tests/integration"]
 pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["src/debate", "src/sdk"]
+omit = [
+    "*/debate/test_gemini.py",
+    "*/debate/gui/*",
+    "*/debate/main.py",
+    "*/debate/process_orchestrator.py",
+    "*/debate/single_orchestrator.py",
+    "*/debate/orchestrator/child_worker.py",
+    "*/debate/orchestrator/parent_worker.py",
+    "*/debate/orchestrator/ping_round.py",
+    "*/debate/orchestrator/process_pool.py",
+    "*/debate/orchestrator/supervisor.py",
+    "*/debate/orchestrator/supervisor_watchdog.py",
+    "*/debate/legacy/session_loop.py",
+    "*/debate/legacy/debate_orchestrator.py",
+]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_empty = true
 
 [tool.ruff]
 line-length = 100

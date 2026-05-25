@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import os
 import subprocess
@@ -31,7 +30,6 @@ class ClaudeAgentClient:
 
     def prompt(self, system: str, user: str) -> ClaudeResponse:
         """Run a single non-interactive CLI invocation."""
-        payload = json.dumps({"system": system, "user": user}, ensure_ascii=False)
         cmd = [
             self._cli,
             "-p",
@@ -58,7 +56,12 @@ class ClaudeAgentClient:
         text = result.stdout.strip()
         return ClaudeResponse(text=text, raw=result.stdout)
 
-    def prompt_api(self, system: str, user: str, model: str = "claude-sonnet-4-20250514") -> ClaudeResponse:
+    def prompt_api(
+        self,
+        system: str,
+        user: str,
+        model: str = "claude-sonnet-4-20250514",
+    ) -> ClaudeResponse:
         """Fallback via Anthropic API when CLI is unavailable."""
         try:
             import anthropic

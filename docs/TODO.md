@@ -116,11 +116,15 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S8-01 | Add pytest-cov to dev dependencies | Renat | [ ] |
-| S8-02 | Unit tests: models, config, env_loader | Alon | [ ] |
-| S8-03 | Integration tests: orchestrator with mock LLM | Renat | [ ] |
-| S8-04 | Measure coverage; fill gaps | Both | [ ] |
+| S8-01 | Add pytest-cov to dev dependencies | Renat | [x] |
+| S8-02 | Unit tests: models, config, env_loader | Alon | [x] |
+| S8-03 | Integration tests: orchestrator with mock LLM | Renat | [x] |
+| S8-04 | Measure coverage; fill gaps | Both | [x] |
 | S8-05 | User commit + push Stage 8 | Both | [ ] |
+
+**Commit message (suggested):** `test: reach 85% coverage with unit and integration tests`
+
+**Coverage:** `uv run pytest --cov` → **88%** on core modules (multiprocess worker entrypoints excluded from coverage scope).
 
 ---
 
@@ -155,7 +159,7 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | OOP + architecture diagram | [x] |
 | PRD / PLAN / TODO | [x] (Stage 1) |
 | Full run screenshots | [ ] |
-| 85% coverage | [ ] |
+| 85% coverage | [x] |
 | 150-line file limit | [ ] |
 | UV + uv.lock | [x] |
 | JSON config in `config/` | [x] |

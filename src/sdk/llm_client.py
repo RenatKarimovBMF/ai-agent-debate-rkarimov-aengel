@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from sdk.claude_client import ClaudeAgentClient, ClaudeResponse
+from sdk.claude_client import ClaudeAgentClient
 from sdk.gemini_client import GeminiAgentClient
 
 logger = logging.getLogger("debate.sdk.llm")

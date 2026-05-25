@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class AgentRole(str, Enum):
+class AgentRole(StrEnum):
     PARENT = "parent"
     PRO = "pro"
     CON = "con"
 
 
-class MessageType(str, Enum):
+class MessageType(StrEnum):
     TURN = "turn"
     RELAY = "relay"
     VERDICT = "verdict"

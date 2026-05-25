@@ -1,4 +1,3 @@
-import logging
 import time
 
 import pytest
@@ -75,19 +74,21 @@ def test_total_requests_property():
     assert gk.requests_for(AgentRole.PRO) == 1
 
 
-def test_denial_is_logged_when_enabled(caplog: pytest.LogCaptureFixture):
-    caplog.set_level(logging.WARNING, logger="debate.gatekeeper")
+def test_denial_is_logged_when_enabled():
+    from unittest.mock import patch
+
     gk = Gatekeeper(
         _config(max_total_requests=1, max_requests_per_agent=1, log_denials=True)
     )
     gk.check(AgentRole.PRO)
     gk.record(AgentRole.PRO)
 
-    with pytest.raises(BudgetExceededError):
-        gk.check(AgentRole.PRO)
+    with patch("debate.gatekeeper.core.log_denial") as mock_log:
+        with pytest.raises(BudgetExceededError):
+            gk.check(AgentRole.PRO)
 
     assert gk.denial_count == 1
-    assert any("gatekeeper_denied" in r.message for r in caplog.records)
+    mock_log.assert_called_once()
 
 
 def test_min_interval_ms_serializes_requests():
