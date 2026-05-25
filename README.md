@@ -1,43 +1,131 @@
-# AI Agent Debate — Exercise 02
+# AI Agent Debate
 
-**Course:** Intelligent Agents (Haifa University)  
-**Authors:** Renat Karimov, Alon Engel  
-**Topic:** Which is the greater film — **The Godfather** (1972) or **The Shawshank Redemption** (1994)?
+**Intelligent Agents — Exercise 02** · Haifa University  
+**Renat Karimov** & **Alon Engel**
 
-## Debate sides
+<p align="center">
+  <img src="assets/posters/godfather.jpg" width="220" alt="The Godfather (1972) poster"/>
+  &nbsp;&nbsp;&nbsp;
+  <img src="assets/posters/shawshank.jpg" width="220" alt="The Shawshank Redemption (1994) poster"/>
+</p>
 
-| Role | Agent | Position |
-|------|--------|----------|
-| Pro | `ProAgent` / skill `debate-pro-godfather` | The Godfather is the greater film |
-| Con | `ConAgent` / skill `debate-con-shawshank` | The Shawshank Redemption is the greater film |
-| Parent | `ParentAgent` / skill `debate-parent-judge` | Host + judge (persuasion only, **no tie**) |
+<p align="center">
+  <strong>Which is the greater film?</strong><br/>
+  Three AI agents argue it out — with live web citations — and a judge picks a winner. No ties.
+</p>
 
-## Free Gemini setup (start here)
+<p align="center">
+  <a href="https://github.com/RenatKarimovBMF/ai-agent-debate-rkarimov-aengel">GitHub repository</a>
+</p>
 
-1. Get a key: **https://aistudio.google.com/apikey** (free, no credit card in most regions)
-2. `copy .env.example .env` and set `GEMINI_API_KEY=AIza...` and `LLM_PROVIDER=gemini`
-3. Install with UV (see **Quick start** below)
-4. `uv run python -m debate.main --dry-run` → should print `LLM provider: gemini`
+---
 
-Full guide: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
+## What you get
 
-## Requirements checklist
+| Agent | Movie | Job |
+|-------|-------|-----|
+| **Pro** | *The Godfather* (1972) | Argues Coppola's epic is the greater film |
+| **Con** | *The Shawshank Redemption* (1994) | Argues Darabont's prison drama wins |
+| **Parent / Judge** | — | Hosts the debate, relays messages, declares a winner |
 
-- [x] Three agents (parent, pro, con) — mediated flow only
-- [x] JSON message protocol (`debate.models`)
-- [x] Python orchestrator (`debate.main`)
-- [x] Separate skills per side (contradiction)
-- [x] Internet citations required in each turn schema
-- [x] 10 pings per side (configurable in `config/setup.json`)
-- [x] Gatekeeper, watchdog hooks, rotating JSONL logs
-- [x] OOP + architecture diagram (`docs/architecture.md`)
-- [x] Tests (`pytest`), Ruff, JSON config in `config/`, `.env.example`
-- [ ] Full run screenshots + sample session log (add after first live run)
-- [ ] GitHub public repo + Moodle PDF per partner (see Submission)
+Agents never talk to each other directly — every turn goes through the **Parent**, like a moderated panel.
 
-## Optional GUI (creativity / screenshots)
+```
+Pro  →  Parent  →  Con  →  Parent  →  Pro  →  …  (10 rounds by default)
+                              ↓
+                    verdict saved to logs/
+```
 
-The assignment **requires** terminal or SDK operation for grading, but **allows** an optional GUI plus screenshots (Exercise 02 §8.6).
+---
+
+## Quick start (about 5 minutes)
+
+### 1. Get a free Gemini API key
+
+Create one at **[Google AI Studio](https://aistudio.google.com/apikey)** (no credit card in most regions).
+
+### 2. Clone and configure
+
+```powershell
+git clone https://github.com/RenatKarimovBMF/ai-agent-debate-rkarimov-aengel.git
+cd ai-agent-debate-rkarimov-aengel
+copy .env.example .env
+```
+
+Edit `.env`:
+
+```env
+GEMINI_API_KEY=AIza...
+LLM_PROVIDER=gemini
+```
+
+More detail: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
+
+### 3. Install dependencies (UV)
+
+```powershell
+# Install uv if needed: https://docs.astral.sh/uv/
+uv sync --extra dev
+```
+
+If `uv` is not on PATH: `python -m uv sync --extra dev`
+
+### 4. Run
+
+```powershell
+# Sanity check (no API calls)
+uv run python -m debate.main --dry-run
+
+# Start the debate
+uv run python -m debate.main
+```
+
+**Budget-friendly demo** (5 pings per side instead of 10):
+
+```powershell
+uv run python -m debate.main --config config/demo_setup.json
+```
+
+---
+
+## Sample run (demo mode, Gemini)
+
+We completed a **5-ping demo** with Google Search grounding. Session `18607637` — about **90 seconds** end-to-end.
+
+**Terminal excerpt:**
+
+```
+SESSION: 18607637
+TOPIC: Which is the greater film: The Godfather (1972) or The Shawshank Redemption (1994)?
+PRO: The Godfather | CON: The Shawshank Redemption
+PINGS PER SIDE: 5
+
+PING 1/5 — PARENT asks PRO to argue
+PRO PROCESS: ping 1 LLM call started...
+PRO PROCESS: ping 1 answer ready
+PRO says: The Godfather stands as a cinematic titan … AFI #2, Academy Awards …
+PRO sources: https://www.imdb.com/… , https://…
+
+PING 1/5 — PARENT asks CON to respond
+CON says: Shawshank holds #1 on IMDb Top 250 for decades — audience love matters …
+
+… (pings 2–5) …
+
+PARENT/JUDGE: Debate finished. Judge is choosing a winner…
+FINAL VERDICT: PRO wins
+PRO score: 88.0 | CON score: 84.0
+Verdict saved to: logs/verdict_18607637.json
+```
+
+**Judge summary:** Pro framed “greatness” as artistic depth, critical consensus (AFI, Oscars, National Film Registry). Con emphasized IMDb popularity and emotional impact. **The Godfather** won on persuasion — not a tie.
+
+Full JSON verdict: [assets/sample-verdict.json](assets/sample-verdict.json) (also saved locally as `logs/verdict_18607637.json` after a run).
+
+---
+
+## Optional GUI
+
+Want screenshots for the submission? Launch the Tkinter window:
 
 ```powershell
 uv run python -m debate.gui
@@ -45,155 +133,108 @@ uv run python -m debate.gui
 uv run python -m debate.main --gui
 ```
 
-The window lets you set **Side A vs Side B** and the **debate question**, then runs the same orchestrator as the terminal. Default values are Godfather vs Shawshank. Add screenshots of the GUI to `assets/screenshots/` for the README.
+Set **Side A vs Side B** and the question, then run — same orchestrator as the terminal.
 
-**You must still demonstrate** `python -m debate.main` from the terminal for the grader.
+> **For grading:** you still need to show `python -m debate.main` from the terminal.
 
-## Quick start (UV)
+---
 
-Install [uv](https://docs.astral.sh/uv/) if needed:
+## Screenshots
+
+Add PNG captures to `assets/screenshots/` for the README and Moodle PDF:
+
+| File | What to capture |
+|------|-----------------|
+| `terminal-dry-run.png` | Output of `--dry-run` |
+| `terminal-debate.png` | Live debate (ping lines + sources) |
+| `gui-debate.png` | Optional GUI window |
+| `verdict-output.png` | Final scores / verdict JSON |
+
+See [assets/screenshots/README.md](assets/screenshots/README.md).
+
+---
+
+## API usage & cost
+
+| Mode | LLM calls (typical) | Notes |
+|------|---------------------|-------|
+| Demo (`demo_setup.json`) | ~11 | 5 Pro + 5 Con + 1 verdict (+ occasional JSON repair) |
+| Full (`setup.json`) | ~21 | 10 Pro + 10 Con + 1 verdict |
+
+**Token estimate (Gemini 2.5 Flash + search):** roughly **15k–25k tokens** for demo, **35k–55k** for full — depends on turn length and grounding.
+
+**Cost:** free tier at [AI Studio](https://aistudio.google.com/) — **$0**, but subject to **rate limits** (HTTP 429). If quota is exhausted:
+
+- Wait and retry, or use `config/demo_setup.json`
+- Course allows reducing 10 → 5 pings when budget is limited — **no grade penalty**
+
+Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interval_ms`, `max_total_requests`).
+
+---
+
+## For graders & reviewers
+
+| Requirement | Status |
+|-------------|--------|
+| Three agents, mediated flow | Done |
+| JSON message protocol | `debate.models` |
+| Python orchestrator | `python -m debate.main` |
+| Separate skills (Pro / Con / Parent) | `.claude/skills/` |
+| Internet citations in schema | Each turn includes URLs |
+| 10 pings/side (configurable) | `config/setup.json` |
+| Gatekeeper + watchdog + JSONL logs | `debate/gatekeeper/`, `logs/` |
+| OOP + architecture diagram | [docs/architecture.md](docs/architecture.md) |
+| PRD / PLAN / TODO | [docs/](docs/) |
+| Tests + 85% coverage | `uv run pytest --cov` |
+| UV + `uv.lock`, JSON config | `config/setup.json` |
+
+**Quality checks:**
 
 ```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-# or: pip install uv
-```
-
-Project setup:
-
-```powershell
-cd "c:\Users\Ренат\Desktop\Haifa Un\6 is Final\Ai\ai-agent-debate-karimov-engel"
-copy .env.example .env
-# Edit .env — set GEMINI_API_KEY (see docs/GEMINI_SETUP.md)
-
-uv sync --extra dev
-uv run python -m debate.main --dry-run
+uv run ruff check src tests
 uv run pytest
-uv run python -m debate.main
+uv run pytest --cov
 ```
 
-If `uv` is not on PATH after pip install, use `python -m uv` instead (e.g. `python -m uv sync --extra dev`).
+**Docs:** [PRD](docs/PRD.md) · [PLAN](docs/PLAN.md) · [Architecture](docs/architecture.md) · [Gemini setup](docs/GEMINI_SETUP.md)
 
-Demo mode (5 pings, lower API usage):
-
-```powershell
-uv run python -m debate.main --config config/demo_setup.json
-```
-
-## Budget note
-
-If API budget is tight, use demo config or edit `config/demo_setup.json`:
-
-```json
-"pings_per_side": 5
-```
-
-Document that here — **no grade penalty** per course instructions.
-
-Gatekeeper limits live in `config/rate_limits.json` (`max_total_requests`, `min_interval_ms`, `log_denials`). Each worker process enforces its own budget counters.
-
-## Full mode and budget demo mode
-
-The default `config/setup.json` uses `pings_per_side: 10`, which matches the full exercise requirement.
-
-Because the system uses real LLM calls with web grounding, a full debate can require many API calls:
-
-- 10 Pro turns
-- 10 Con turns
-- 1 Parent/Judge verdict
-- possible JSON repair calls
-- possible retry calls after rate limits
-
-On free Gemini quota this can trigger HTTP 429 rate-limit errors.
-
-For demonstration under a limited free API quota, use `config/demo_setup.json` (`pings_per_side: 5`). This follows the assignment note allowing a reduction from 10 to 5 pings when budget is limited.
-
-Run full mode:
-
-```powershell
-uv run python -m debate.main
-```
-
-Run budget demo mode:
-
-```powershell
-uv run python -m debate.main --config config/demo_setup.json
-```
+---
 
 ## Project layout
 
 ```
 ai-agent-debate-karimov-engel/
-├── pyproject.toml           # Project metadata + dependencies
-├── uv.lock                  # Locked dependency versions (UV)
-├── config/                  # setup.json, rate_limits.json (+ demo variants)
-├── .env.example
-├── .claude/skills/          # pro / con / parent skills
-├── .claude/commands/        # optional CLI command
-├── src/debate/              # orchestrator, agents, IPC, gatekeeper
-│   ├── orchestrator/        # multiprocess debate (Stage 3)
-│   ├── agents/              # pro, con, parent agents (Stage 4)
-│   ├── gui/                 # optional Tkinter UI (Stage 4)
-│   └── legacy/              # single-process reference orchestrator
-├── src/sdk/                 # LLM SDK (Gemini / Claude)
-├── docs/                    # PRD, PLAN, TODO, architecture
-├── tests/unit/              # unit tests
-├── tests/integration/       # integration tests
-├── assets/screenshots/      # README screenshots
-├── fifo/                    # IPC queues (runtime)
-└── logs/                    # JSONL logs + verdict_*.json
+├── config/              setup.json, rate_limits.json (+ demo variants)
+├── src/debate/          orchestrator, agents, gatekeeper, optional GUI
+├── src/sdk/             Gemini / Claude LLM clients
+├── tests/               unit + integration (85%+ coverage)
+├── assets/posters/      README movie art
+├── assets/screenshots/  submission captures
+├── .claude/skills/      manual Stage 1–2 agent skills
+└── logs/                JSONL logs + verdict_*.json (local, gitignored)
 ```
 
-## Message flow
-
-```
-Pro  →  Parent  →  Con  →  Parent  →  Pro  →  …  (10 rounds)
-                ↓
-         verdict_*.json (winner by persuasion)
-```
-
-Children never communicate directly.
-
-## Claude skills (manual stage 1–2)
-
-Install skills from `.claude/skills/` in Claude Code, or copy to `~/.claude/skills/`.
-
-Suggested manual test:
-
-1. Terminal A — parent skill  
-2. Terminal B — pro skill  
-3. Terminal C — con skill  
-4. Paste JSON turns through parent only  
-
-Then run stage 3: `python -m debate.main`.
+---
 
 ## Submission (pairs)
 
-| Who | Moodle | GitHub |
-|-----|--------|--------|
-| Renat Karimov | Upload PDF with **your** repo link | Push code; share with lecturer or **public** repo |
-| Alon Engel | Upload PDF with **your** repo link | Same codebase; **different** Moodle PDF each |
+| Partner | Moodle | GitHub |
+|---------|--------|--------|
+| Renat Karimov | PDF with repo link | This repo |
+| Alon Engel | PDF with repo link | Same repo, separate PDF |
 
-Do **not** submit only one partner’s repo link on Moodle.  
+Each partner uploads their **own** Moodle PDF pointing to the **same** public GitHub URL.  
 Do **not** commit `.env` — only `.env.example`.
 
-## Pair workflow
+---
 
-1. One shared GitHub repo (both push)  
-2. Run full debate once; save screenshots to `assets/screenshots/`  
-3. Copy sample `logs/debate_000.jsonl` excerpt into README  
-4. Each partner submits own Moodle PDF pointing to the same GitHub URL  
+## Poster credits
 
-## Lint and tests
+Posters in `assets/posters/` are used for educational illustration (Wikipedia film articles).  
+*The Godfather* © Paramount Pictures · *The Shawshank Redemption* © Columbia Pictures.
 
-```powershell
-uv run ruff check src tests
-uv run ruff format src tests
-uv run pytest
-uv run pytest --cov
-```
-
-Coverage target is **85%** on core modules (`src/debate`, `src/sdk`). Multiprocess worker entrypoints are excluded from the coverage gate because they require live process integration tests.
+---
 
 ## License
 
-Academic project — Haifa University, Exercise 02.
+Academic project — Haifa University, Intelligent Agents, Exercise 02.

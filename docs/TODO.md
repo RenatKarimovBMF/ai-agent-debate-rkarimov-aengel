@@ -132,14 +132,16 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S9-01 | Full debate run (10 pings) with Gemini + search | Both | [ ] |
-| S9-02 | Demo run (5 pings) documented in README | Renat | [ ] |
-| S9-03 | Screenshots: terminal, GUI, logs, verdict | Alon | [ ] |
-| S9-04 | Prompt log + token/cost analysis | Renat | [ ] |
-| S9-05 | Fix README (paths, broken fences, repo name) | Alon | [ ] |
-| S9-06 | Final Ruff + pytest + dry-run checklist | Both | [ ] |
-| S9-07 | Moodle PDF per partner (same GitHub URL) | Both | [ ] |
+| S9-01 | Full debate run (10 pings) with Gemini + search | Both | [ ] optional if quota allows |
+| S9-02 | Demo run (5 pings) documented in README | Renat | [x] |
+| S9-03 | Screenshots: terminal, GUI, logs, verdict | Alon | [ ] add PNGs to assets/screenshots/ |
+| S9-04 | Prompt log + token/cost analysis | Renat | [x] |
+| S9-05 | User-friendly README + movie posters | Alon | [x] |
+| S9-06 | Final Ruff + pytest + dry-run checklist | Both | [x] |
+| S9-07 | Moodle PDF per partner (same GitHub URL) | Both | manual (by hand) |
 | S9-08 | User commit + push final | Both | [ ] |
+
+**Commit message (suggested):** `docs: polish README for submission with posters and sample run`
 
 ---
 
@@ -158,7 +160,7 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | Rotating logs | [x] |
 | OOP + architecture diagram | [x] |
 | PRD / PLAN / TODO | [x] (Stage 1) |
-| Full run screenshots | [ ] |
+| Full run screenshots | [ ] add to assets/screenshots/ |
 | 85% coverage | [x] |
 | 150-line file limit | [ ] |
 | UV + uv.lock | [x] |
