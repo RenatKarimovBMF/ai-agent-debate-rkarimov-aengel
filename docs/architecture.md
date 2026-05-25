@@ -81,4 +81,4 @@ No direct Pro ↔ Con channel.
 
 ## Configuration
 
-All tunables live in `config.toml` (no hardcoded debate parameters in code).
+All tunables live in `config/setup.json` and `config/rate_limits.json` (no hardcoded debate parameters in code).

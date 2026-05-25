@@ -19,7 +19,7 @@ def main(argv: list[str] | None = None) -> int:
         "--config",
         type=Path,
         default=None,
-        help="Path to config.toml (default: project root)",
+        help="Path to setup JSON (default: config/setup.json)",
     )
     parser.add_argument(
         "--dry-run",

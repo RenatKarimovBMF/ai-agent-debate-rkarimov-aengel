@@ -154,7 +154,7 @@ Supervisor joins workers with bounded wait; terminates alive workers if needed.
 
 ## 9. Configuration dependencies
 
-From `config.toml` (future: `config/setup.json`):
+From `config/setup.json` and `config/rate_limits.json`:
 
 | Key | Used for |
 |-----|----------|

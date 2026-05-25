@@ -104,7 +104,7 @@ Keys containing markers like `your-key`, `paste`, `sk-ant-your`, `example` are t
 - Model fallback chain on recoverable errors (429, model unavailable).
 - Return text suitable for agent JSON parsing.
 
-### Configuration (from `config.toml`)
+### Configuration (from `config/setup.json`)
 
 | Key | Default | Notes |
 |-----|---------|-------|

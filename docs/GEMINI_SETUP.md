@@ -45,10 +45,10 @@ The app will use **Gemini 2.0 Flash** with **Google Search** for real citations 
 
 ## Save money
 
-In `config.toml` use:
+In `config/demo_setup.json` set:
 
-```toml
-pings_per_side = 5
+```json
+"pings_per_side": 5
 ```
 
 Allowed by the assignment — note it in README.
@@ -69,7 +69,7 @@ Do not reuse an old copied key from chat or email.
 Often means:
 
 1. **Wrong model** — we now use `gemini-2.5-flash` first (not `2.0-flash`).
-2. **Google Search** needs billing in some regions — set `use_google_search = false` in `config.toml`.
+2. **Google Search** needs billing in some regions — set `"use_google_search": false` in `config/setup.json`.
 3. **Region** — free tier may be unavailable (quota shows `limit: 0`). Try a new key, VPN, or ask the lecturer.
 4. **Test one call** before full debate:
 

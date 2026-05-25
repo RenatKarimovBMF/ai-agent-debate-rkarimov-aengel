@@ -28,10 +28,10 @@ Full guide: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
 - [x] Python orchestrator (`debate.main`)
 - [x] Separate skills per side (contradiction)
 - [x] Internet citations required in each turn schema
-- [x] 10 pings per side (configurable in `config.toml`)
+- [x] 10 pings per side (configurable in `config/setup.json`)
 - [x] Gatekeeper, watchdog hooks, rotating JSONL logs
 - [x] OOP + architecture diagram (`docs/architecture.md`)
-- [x] Tests (`pytest`), Ruff, `config.toml`, `.env.example`
+- [x] Tests (`pytest`), Ruff, JSON config in `config/`, `.env.example`
 - [ ] Full run screenshots + sample session log (add after first live run)
 - [ ] GitHub public repo + Moodle PDF per partner (see Submission)
 
@@ -76,22 +76,22 @@ If `uv` is not on PATH after pip install, use `python -m uv` instead (e.g. `pyth
 Demo mode (5 pings, lower API usage):
 
 ```powershell
-uv run python -m debate.main --config config.demo.toml
+uv run python -m debate.main --config config/demo_setup.json
 ```
 
 ## Budget note
 
-If API budget is tight, set in `config.toml`:
+If API budget is tight, use demo config or edit `config/demo_setup.json`:
 
-```toml
-pings_per_side = 5
+```json
+"pings_per_side": 5
 ```
 
 Document that here — **no grade penalty** per course instructions.
 
 ## Full mode and budget demo mode
 
-The default `config.toml` uses `pings_per_side = 10`, which matches the full exercise requirement.
+The default `config/setup.json` uses `pings_per_side: 10`, which matches the full exercise requirement.
 
 Because the system uses real LLM calls with web grounding, a full debate can require many API calls:
 
@@ -103,7 +103,7 @@ Because the system uses real LLM calls with web grounding, a full debate can req
 
 On free Gemini quota this can trigger HTTP 429 rate-limit errors.
 
-For demonstration under a limited free API quota, the repository also includes `config.demo.toml`, which uses `pings_per_side = 5`. This follows the assignment note allowing a reduction from 10 to 5 pings when budget is limited.
+For demonstration under a limited free API quota, use `config/demo_setup.json` (`pings_per_side: 5`). This follows the assignment note allowing a reduction from 10 to 5 pings when budget is limited.
 
 Run full mode:
 
@@ -114,7 +114,7 @@ uv run python -m debate.main
 Run budget demo mode:
 
 ```powershell
-uv run python -m debate.main --config config.demo.toml
+uv run python -m debate.main --config config/demo_setup.json
 ```
 
 ## Project layout
@@ -123,8 +123,7 @@ uv run python -m debate.main --config config.demo.toml
 ai-agent-debate-karimov-engel/
 ├── pyproject.toml           # Project metadata + dependencies
 ├── uv.lock                  # Locked dependency versions (UV)
-├── config.toml              # Runtime config (JSON scaffold in config/)
-├── config/                  # setup.json, rate_limits.json (Stage 6 target)
+├── config/                  # setup.json, rate_limits.json (+ demo variants)
 ├── .env.example
 ├── .claude/skills/          # pro / con / parent skills
 ├── .claude/commands/        # optional CLI command

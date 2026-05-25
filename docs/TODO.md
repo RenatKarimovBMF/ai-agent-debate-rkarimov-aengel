@@ -86,11 +86,13 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S6-01 | Create `config/setup.json` from TOML debate section | Alon | [ ] |
-| S6-02 | Create `config/rate_limits.json` for gatekeeper | Renat | [ ] |
-| S6-03 | Update `debate.config` loader | Alon | [ ] |
-| S6-04 | Keep `config.demo.toml` or add demo JSON variant | Renat | [ ] |
+| S6-01 | Create `config/setup.json` from TOML debate section | Alon | [x] |
+| S6-02 | Create `config/rate_limits.json` for gatekeeper | Renat | [x] |
+| S6-03 | Update `debate.config` loader | Alon | [x] |
+| S6-04 | Demo JSON variants (`demo_setup.json`, `demo_rate_limits.json`) | Renat | [x] |
 | S6-05 | User commit + push Stage 6 | Both | [ ] |
+
+**Commit message (suggested):** `refactor: load runtime config from JSON in config/`
 
 ---
 
@@ -151,7 +153,8 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | Full run screenshots | [ ] |
 | 85% coverage | [ ] |
 | 150-line file limit | [ ] |
-| UV + uv.lock | [ ] |
+| UV + uv.lock | [x] |
+| JSON config in `config/` | [x] |
 
 ---
 

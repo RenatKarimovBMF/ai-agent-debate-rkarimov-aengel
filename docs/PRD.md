@@ -89,7 +89,7 @@ Build a **mediated multi-agent debate system** in Python where three LLM-powered
 
 ### 4.7 Configuration
 
-- **FR-22:** Debate parameters in config files (currently `config.toml`; target: `config/setup.json` per guidelines).
+- **FR-22:** Debate parameters in `config/setup.json` and gatekeeper limits in `config/rate_limits.json`.
 - **FR-23:** No hardcoded debate topic, ping count, or side names in application logic.
 
 ### 4.8 Entry points

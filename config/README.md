@@ -1,14 +1,35 @@
 # Configuration
 
-JSON configuration scaffold for Guidelines V3 compliance.
+All runtime settings live in JSON under `config/` (Guidelines V3).
 
 | File | Purpose |
 |------|---------|
-| `setup.json` | Debate, LLM, agents, IPC, and logging settings (mirrors `config.toml`) |
-| `demo_setup.json` | Budget-friendly demo settings (mirrors `config.demo.toml`) |
-| `rate_limits.json` | Gatekeeper limits (mirrors `[gatekeeper]` in `config.toml`) |
-| `demo_rate_limits.json` | Tighter limits for demo runs |
+| `setup.json` | Debate, LLM, agents, IPC, and logging |
+| `demo_setup.json` | Budget-friendly demo (5 pings) |
+| `rate_limits.json` | Gatekeeper limits for full runs |
+| `demo_rate_limits.json` | Tighter gatekeeper limits for demo runs |
 
-**Runtime note:** The application still loads `config.toml` / `config.demo.toml` at the project root. Stage 6 will switch the loader to these JSON files.
+## Loading
 
-Keep TOML and JSON values in sync until the migration is complete.
+Default (full mode):
+
+```powershell
+uv run python -m debate.main
+```
+
+Loads `config/setup.json` + `config/rate_limits.json`.
+
+Demo mode:
+
+```powershell
+uv run python -m debate.main --config config/demo_setup.json
+```
+
+Loads `config/demo_setup.json` + `config/demo_rate_limits.json` automatically.
+
+## Editing
+
+- **10 pings / full budget:** edit `setup.json` and `rate_limits.json`
+- **5 pings / demo:** edit `demo_setup.json` and `demo_rate_limits.json`
+
+No hardcoded debate parameters in Python source files.

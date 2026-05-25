@@ -82,7 +82,9 @@ self._gatekeeper.record(self._role)
 
 ## 5. Configuration
 
-Current source: `[gatekeeper]` in `config.toml`.
+Current source: `config/rate_limits.json` (paired with `config/setup.json`).
+
+Demo runs use `config/demo_rate_limits.json` with `config/demo_setup.json`.
 
 | Field | Type | Default (full config) | Description |
 |-------|------|------------------------|-------------|
@@ -90,7 +92,7 @@ Current source: `[gatekeeper]` in `config.toml`.
 | `max_total_requests` | int | `200` | Cap for entire session |
 | `max_requests_per_agent` | int | `80` | Cap per `AgentRole` |
 
-Demo config (`config.demo.toml`) uses tighter limits for cheap runs.
+Demo config (`config/demo_setup.json` + `config/demo_rate_limits.json`) uses tighter limits for cheap runs.
 
 ### Future (Stage 6–7): `config/rate_limits.json`
 
