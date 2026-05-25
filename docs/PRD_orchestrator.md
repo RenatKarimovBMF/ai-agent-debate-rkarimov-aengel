@@ -1,7 +1,7 @@
 # Mechanism PRD — Process Orchestrator
 
 **Component:** `ProcessDebateOrchestrator`  
-**Module:** `debate.process_orchestrator` (to be split in Stage 3)  
+**Module:** `debate.orchestrator` (split in Stage 3)  
 **Version:** 1.00  
 **Authors:** Renat Karimov, Alon Engel  
 **Last updated:** 2026-05-21
@@ -178,17 +178,24 @@ From `config.toml` (future: `config/setup.json`):
 
 ## 11. Refactor plan (Stage 3)
 
-Split into modules under `debate/orchestrator/`:
+Split complete under `debate/orchestrator/`:
 
 | Module | Contents |
 |--------|----------|
-| `supervisor.py` | `ProcessDebateOrchestrator`, spawn/join |
-| `parent_worker.py` | `_parent_worker`, validation, relay |
-| `child_worker.py` | `_child_worker`, turn commands |
-| `events.py` | `_event`, progress payload helpers |
-| `commands.py` | Command type constants / typed dicts |
+| `supervisor.py` | `ProcessDebateOrchestrator`, session run loop |
+| `process_pool.py` | Spawn, stop, restart worker processes |
+| `supervisor_watchdog.py` | Process health watchdog |
+| `parent_worker.py` | Parent process entry + ping loop |
+| `ping_round.py` | Single ping round (pro + con) |
+| `child_worker.py` | Pro/Con worker entry |
+| `messages.py` | `validate_child_message`, `make_relay` |
+| `events.py` | Event queue helpers |
+| `commands.py` | IPC command builders |
+| `factory.py` | Agent and LLM client factory |
+| `verdict_io.py` | Verdict file write + done event |
+| `types.py` | Shared type aliases |
 
-**Acceptance:** Each file ≤ 150 lines; existing integration tests pass.
+**Acceptance:** Each file ≤ 150 code lines; unit tests pass.
 
 ---
 

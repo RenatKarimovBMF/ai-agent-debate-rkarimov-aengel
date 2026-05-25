@@ -6,7 +6,7 @@ from pathlib import Path
 
 from debate.config import load_config
 from debate.env_loader import ensure_env_loaded
-from debate.process_orchestrator import ProcessDebateOrchestrator
+from debate.orchestrator import ProcessDebateOrchestrator
 
 
 def main(argv: list[str] | None = None) -> int:

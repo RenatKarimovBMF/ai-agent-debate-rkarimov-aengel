@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from debate.models import AgentRole, DebateMessage, DebatePayload, MessageType
-from debate.process_orchestrator import _make_relay, _validate_child_message
+from debate.orchestrator.messages import make_relay, validate_child_message
 
 
 def test_make_relay_goes_through_parent() -> None:
@@ -18,7 +18,7 @@ def test_make_relay_goes_through_parent() -> None:
         ),
     )
 
-    relay = _make_relay(original, AgentRole.CON)
+    relay = make_relay(original, AgentRole.CON)
 
     assert relay.type == MessageType.RELAY
     assert relay.from_role == AgentRole.PARENT
@@ -40,7 +40,7 @@ def test_validate_child_message_accepts_correct_turn() -> None:
         ),
     )
 
-    result = _validate_child_message(
+    result = validate_child_message(
         message.model_dump(mode="json"),
         expected_sender=AgentRole.PRO,
         session_id="abc123",
@@ -66,7 +66,7 @@ def test_validate_child_message_rejects_direct_child_to_child_message() -> None:
     )
 
     try:
-        _validate_child_message(
+        validate_child_message(
             message.model_dump(mode="json"),
             expected_sender=AgentRole.PRO,
             session_id="abc123",

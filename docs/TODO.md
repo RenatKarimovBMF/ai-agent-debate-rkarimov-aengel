@@ -42,13 +42,15 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S3-01 | Extract worker modules from `process_orchestrator.py` | Alon | [ ] |
-| S3-02 | Extract supervisor / session lifecycle | Renat | [ ] |
-| S3-03 | Keep all files ≤ 150 lines | Both | [ ] |
-| S3-04 | Update / add unit tests for extracted modules | Alon | [ ] |
+| S3-01 | Extract worker modules from `process_orchestrator.py` | Alon | [x] |
+| S3-02 | Extract supervisor / session lifecycle | Renat | [x] |
+| S3-03 | Keep all files ≤ 150 lines | Both | [x] |
+| S3-04 | Update / add unit tests for extracted modules | Alon | [x] |
 | S3-05 | User commit + push Stage 3 | Both | [ ] |
 
-**Files over limit today:** `process_orchestrator.py` (~519 lines)
+**Commit message (suggested):** `refactor: split process orchestrator into debate.orchestrator package`
+
+**Result:** `src/debate/orchestrator/` — 12 modules, each ≤ 82 code lines (150 limit per Guidelines V3).
 
 ---
 

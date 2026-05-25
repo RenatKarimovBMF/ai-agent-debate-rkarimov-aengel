@@ -56,7 +56,7 @@ flowchart TB
 |-----------|----------|----------------|
 | CLI entry | `debate.main` | Argument parsing, config load, orchestrator start |
 | GUI entry | `debate.gui` | Tkinter UI, live progress via event queue |
-| Process orchestrator | `debate.process_orchestrator` | Multiprocess supervisor + parent worker |
+| Process orchestrator | `debate.orchestrator` | Multiprocess supervisor + parent/child workers |
 | Agent workers | Child processes | Pro/Con LLM turns in isolation |
 | Agent logic | `debate.agents` | Role prompts, turn building, JSON validation |
 | Models | `debate.models` | Pydantic schemas for IPC |
