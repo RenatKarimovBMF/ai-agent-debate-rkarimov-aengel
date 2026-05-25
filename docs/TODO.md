@@ -100,11 +100,15 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
 | ID | Task | Owner | Status |
 |----|------|-------|--------|
-| S7-01 | Add request queue / serialization before LLM calls | Alon | [ ] |
-| S7-02 | Log denied requests with reason | Renat | [ ] |
-| S7-03 | Wire rate limits from `config/rate_limits.json` | Alon | [ ] |
-| S7-04 | Expand `tests/unit/test_gatekeeper.py` | Renat | [ ] |
+| S7-01 | Add request queue / serialization before LLM calls | Alon | [x] |
+| S7-02 | Log denied requests with reason | Renat | [x] |
+| S7-03 | Wire rate limits from `config/rate_limits.json` | Alon | [x] |
+| S7-04 | Expand `tests/unit/test_gatekeeper.py` | Renat | [x] |
 | S7-05 | User commit + push Stage 7 | Both | [ ] |
+
+**Commit message (suggested):** `feat: enhance gatekeeper with interval queue and denial logging`
+
+**Note:** Limits apply per worker process (pro, con, parent each have their own gatekeeper).
 
 ---
 
@@ -145,7 +149,7 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | Separate skills (Pro / Con / Parent) | [x] |
 | Internet citations in schema | [x] |
 | 10 pings/side (configurable) | [x] |
-| Gatekeeper | [x] (enhance Stage 7) |
+| Gatekeeper | [x] (interval queue + denial logs) |
 | Watchdog hooks | [x] |
 | Rotating logs | [x] |
 | OOP + architecture diagram | [x] |

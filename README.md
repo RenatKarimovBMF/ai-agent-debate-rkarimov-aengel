@@ -89,6 +89,8 @@ If API budget is tight, use demo config or edit `config/demo_setup.json`:
 
 Document that here — **no grade penalty** per course instructions.
 
+Gatekeeper limits live in `config/rate_limits.json` (`max_total_requests`, `min_interval_ms`, `log_denials`). Each worker process enforces its own budget counters.
+
 ## Full mode and budget demo mode
 
 The default `config/setup.json` uses `pings_per_side: 10`, which matches the full exercise requirement.

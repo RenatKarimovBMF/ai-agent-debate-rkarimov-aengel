@@ -143,7 +143,7 @@ Each worker process instantiates **its own** `Gatekeeper`. Counters are **not sh
 
 **Implication:** Global limit is per-process, not cluster-wide. For this assignment, Parent and children maintain separate instances — Stage 7 should document or unify via shared manager if true global cap is required.
 
-**Current design note:** Pro and Con workers each have independent gatekeepers; Parent has its own. Supervisor does not aggregate. Acceptable for MVP; Stage 7 may introduce `multiprocessing.Manager` dict for shared totals.
+**Current design (Stage 7):** Pro, Con, and Parent workers each instantiate their own `Gatekeeper`. Global caps in JSON apply **per process**, not across the whole session. This is documented in the module docstring and is acceptable for the assignment; a shared `multiprocessing.Manager` counter is out of scope.
 
 ---
 
@@ -166,10 +166,11 @@ Gatekeeper does **not** wrap transport IPC — only LLM/API calls count.
 
 - Exception propagates to worker → ERROR event → session log.
 
-### Stage 7
+### Stage 7 (implemented)
 
-- Log structured denial: `{event: "gatekeeper_denied", role, reason, totals}`.
-- Optional queue: serialize LLM requests through a single worker if `min_interval_ms > 0`.
+- Log structured denial: `{event: "gatekeeper_denied", role, reason, totals}` when `log_denials` is true.
+- Thread lock + `min_interval_ms` sleep serializes LLM calls within a process.
+- Limits read from `config/rate_limits.json` via `GatekeeperConfig`.
 
 ---
 
@@ -198,11 +199,12 @@ Gatekeeper does **not** wrap transport IPC — only LLM/API calls count.
 ## 12. Acceptance criteria
 
 - [x] MVP counter-based gatekeeper implemented.
-- [x] Config-driven limits from TOML.
-- [x] Unit tests for check/record/budget error.
-- [ ] Shared cross-process totals OR documented per-process semantics (Stage 7).
-- [ ] Request queue + denial logs (Stage 7).
-- [ ] Limits loaded from `config/rate_limits.json` (Stage 6).
+- [x] Config-driven limits from `config/rate_limits.json`.
+- [x] Unit tests for check/record/budget error, denials, and interval queue.
+- [x] Per-process semantics documented (each worker has its own gatekeeper).
+- [x] Request serialization via `min_interval_ms` + thread lock.
+- [x] Structured denial logging when `log_denials` is true.
+- [x] Limits loaded from `config/rate_limits.json`.
 
 ---
 

@@ -3,5 +3,5 @@
   "max_total_requests": 80,
   "max_requests_per_agent": 30,
   "min_interval_ms": 0,
-  "log_denials": false
+  "log_denials": true
 }
