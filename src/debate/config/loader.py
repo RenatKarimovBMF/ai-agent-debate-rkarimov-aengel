@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
+from debate._version import EXPECTED_CONFIG_VERSION
 from debate.config.models import (
     AgentsConfig,
     AppConfig,
@@ -14,6 +16,8 @@ from debate.config.models import (
     LlmConfig,
     LoggingConfig,
 )
+
+log = logging.getLogger("debate.config")
 
 
 def project_root() -> Path:
@@ -41,6 +45,31 @@ def resolve_rate_limits_path(setup_path: Path) -> Path:
 
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _validate_config_version(payload: dict[str, Any], path: Path) -> None:
+    """Enforce the version-key contract from submission guidelines §8.1.
+
+    Missing version is a hard error so we never run with a config the
+    user forgot to migrate. A version mismatch is logged as a warning
+    rather than failing — the runtime can usually proceed and the user
+    just needs to know they may be running against an older schema.
+    """
+    version = payload.get("version")
+    if version is None:
+        raise ValueError(
+            f"Config file is missing required 'version' key: {path}. "
+            f"Expected version '{EXPECTED_CONFIG_VERSION}'."
+        )
+
+    if str(version) != EXPECTED_CONFIG_VERSION:
+        log.warning(
+            "Config version mismatch in %s: file says %r, code expects %r. "
+            "Continuing, but consider bumping the file.",
+            path,
+            version,
+            EXPECTED_CONFIG_VERSION,
+        )
 
 
 def _build_app_config(
@@ -85,6 +114,10 @@ def load_config(path: Path | None = None) -> AppConfig:
 
     setup = _read_json(setup_path)
     rate_limits = _read_json(rate_path)
+
+    _validate_config_version(setup, setup_path)
+    _validate_config_version(rate_limits, rate_path)
+
     return _build_app_config(setup, rate_limits, root)
 
 

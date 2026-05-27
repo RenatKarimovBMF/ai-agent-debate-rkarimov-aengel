@@ -1,4 +1,5 @@
 {
+  "version": "1.00",
   "enabled": true,
   "max_total_requests": 80,
   "max_requests_per_agent": 30,

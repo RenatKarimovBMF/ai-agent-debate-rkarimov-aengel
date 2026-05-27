@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from debate import __version__
 from debate.config import load_config
 from debate.env_loader import ensure_env_loaded
 from debate.orchestrator import ProcessDebateOrchestrator
@@ -14,6 +15,11 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(
         description="AI Agent Debate — Exercise 02"
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"ai-agent-debate {__version__}",
     )
     parser.add_argument(
         "--config",
@@ -65,6 +71,7 @@ def main(argv: list[str] | None = None) -> int:
             use_google_search=config.llm.use_google_search,
         )
 
+        print(f"App version: {__version__}")
         print(f"LLM provider: {client.active_provider()}")
         print(f"Topic: {config.debate.topic}")
         print(f"Pings per side: {config.debate.pings_per_side}")

@@ -1,3 +1,5 @@
 """AI Agent Debate — Exercise 02, Haifa University."""
 
-__version__ = "0.1.0"
+from debate._version import EXPECTED_CONFIG_VERSION, __version__
+
+__all__ = ["__version__", "EXPECTED_CONFIG_VERSION"]
