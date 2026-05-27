@@ -6,11 +6,11 @@ from pathlib import Path
 from tkinter import messagebox
 
 from debate.config import load_config
-from debate.env_loader import ensure_env_loaded, gemini_key_hint
+from debate.env_loader import ensure_env_loaded
+from debate.gui.env_check import resolve_provider_status, validate_inputs
 from debate.gui.layout import GuiWidgets, build_layout
 from debate.gui.runner import start_debate_thread
 from debate.gui.theme import BG
-from sdk.llm_client import LlmClient
 
 
 class DebateGui(tk.Tk):
@@ -31,7 +31,7 @@ class DebateGui(tk.Tk):
 
         ensure_env_loaded()
         self._load_defaults()
-        self._refresh_env_status()
+        self.w.env_status.config(text=resolve_provider_status())
         self._log("Tip: Terminal mode still works: python -m debate.main")
         self._log("Live progress will appear here after you press Start debate.")
         self.after(100, self._drain_log_queue)
@@ -75,39 +75,6 @@ class DebateGui(tk.Tk):
     def _set_status(self, msg: str) -> None:
         self.w.status.config(text=msg)
 
-    def _refresh_env_status(self) -> None:
-        ensure_env_loaded()
-
-        try:
-            cfg = load_config()
-            client = LlmClient(
-                cli_command=cfg.agents.cli_command,
-                workdir=cfg.project_root / cfg.agents.workdir,
-                gemini_model=cfg.llm.gemini_model,
-                gemini_fallback_models=cfg.llm.gemini_model_fallbacks,
-                use_google_search=cfg.llm.use_google_search,
-            )
-            provider = client.active_provider()
-            hint = gemini_key_hint()
-            self.w.env_status.config(text=f"LLM: {provider} | {hint}")
-        except Exception as exc:
-            self.w.env_status.config(text=f"LLM setup error: {exc}")
-
-    def _validate(self) -> tuple[str, str, str] | None:
-        pro = self.w.pro_entry.get().strip()
-        con = self.w.con_entry.get().strip()
-        topic = self.w.topic_entry.get().strip()
-
-        if not pro or not con or not topic:
-            messagebox.showwarning("Missing fields", "Fill in both sides and the debate question.")
-            return None
-
-        if pro.lower() == con.lower():
-            messagebox.showwarning("Same sides", "Pro and Con must be different.")
-            return None
-
-        return pro, con, topic
-
     def _set_running_ui(self, running: bool) -> None:
         state = tk.DISABLED if running else tk.NORMAL
         self.w.start_btn.config(state=state)
@@ -120,11 +87,14 @@ class DebateGui(tk.Tk):
         if self._running:
             return
 
-        values = self._validate()
-        if not values:
-            return
+        pro = self.w.pro_entry.get().strip()
+        con = self.w.con_entry.get().strip()
+        topic = self.w.topic_entry.get().strip()
 
-        pro, con, topic = values
+        error = validate_inputs(pro, con, topic)
+        if error:
+            messagebox.showwarning("Invalid input", error)
+            return
 
         self._running = True
         self._set_running_ui(True)
