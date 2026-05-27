@@ -1,8 +1,8 @@
 # Project TODO — AI Agent Debate
 
 **Authors:** Renat Karimov, Alon Engel  
-**Version:** 1.00  
-**Last updated:** 2026-05-21
+**Version:** 1.00 (submission baseline)  
+**Last updated:** 2026-05-27
 
 Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 
@@ -135,13 +135,72 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | S9-01 | Full debate run (10 pings) with Gemini + search | Both | [ ] optional if quota allows |
 | S9-02 | Demo run (5 pings) documented in README | Renat | [x] |
 | S9-03 | Screenshots: terminal, GUI, logs, verdict | Alon | [ ] add PNGs to assets/screenshots/ |
-| S9-04 | Prompt log + token/cost analysis | Renat | [x] |
+| S9-04 | Prompt log + token/cost analysis | Renat | [x] (see `docs/PROMPTS.md`) |
 | S9-05 | User-friendly README + movie posters | Alon | [x] |
 | S9-06 | Final Ruff + pytest + dry-run checklist | Both | [x] |
 | S9-07 | Moodle PDF per partner (same GitHub URL) | Both | manual (by hand) |
 | S9-08 | User commit + push final | Both | [ ] |
 
-**Commit message (suggested):** `docs: polish README for submission with posters and sample run`
+---
+
+## Stage 10 — Skill architecture overhaul
+
+Triggered by the in-class clarifications: project-local skills only, research-backed judging, multi-skill debaters, host-style opening, refute-with-citation rule.
+
+| ID | Task | Owner | Status |
+|----|------|-------|--------|
+| S10-01 | Rewrite `debate-parent-judge` skill around five principles (WUDC / IDEA / NSDA / Snider) | Renat | [x] |
+| S10-02 | New `debate-host-protocol` skill (opening briefing, side assignment) | Alon | [x] |
+| S10-03 | New `debate-judge-rubric` skill (Matter/Manner/Method/Clash/Burden) | Renat | [x] |
+| S10-04 | New `debate-argument-builder` skill (CWI-S, side-agnostic) | Alon | [x] |
+| S10-05 | New `debate-rebuttal-strategist` skill (refute-with-citation, side-agnostic) | Renat | [x] |
+| S10-06 | Slim `debate-pro-godfather` / `debate-con-shawshank` to lore-only | Alon | [x] |
+| S10-07 | `docs/PRD_judge_rubric.md` — research basis + skill stack | Renat | [x] |
+
+---
+
+## Stage 11 — Runtime side assignment
+
+| ID | Task | Owner | Status |
+|----|------|-------|--------|
+| S11-01 | `orchestrator/host_protocol.py` with `decide_sides()` and `send_assignments()` | Alon | [x] |
+| S11-02 | `ASSIGN` command in `orchestrator/commands.py`, handled in `child_worker.py` | Renat | [x] |
+| S11-03 | `DebaterAgent` base with `apply_assignment()` + thin `ProAgent`/`ConAgent` | Alon | [x] |
+| S11-04 | Parent worker sends assignments before the ping loop | Renat | [x] |
+| S11-05 | Update debater + judge prompts to reference runtime assignment | Alon | [x] |
+| S11-06 | Update CLI `--dry-run` and GUI labels to reflect "options on the table" | Renat | [x] |
+| S11-07 | `tests/unit/test_host_protocol.py` — determinism + variability + override | Alon | [x] |
+
+---
+
+## Stage 12 — Version tracking and prompt book
+
+| ID | Task | Owner | Status |
+|----|------|-------|--------|
+| S12-01 | `src/debate/_version.py` with `__version__ = "1.00"` | Renat | [x] |
+| S12-02 | Bump `pyproject.toml` to `1.00` and re-export from `debate.__init__` | Alon | [x] |
+| S12-03 | Add `"version": "1.00"` to all four JSON config files | Renat | [x] |
+| S12-04 | `_validate_config_version` in `config/loader.py` (hard-fail on missing) | Alon | [x] |
+| S12-05 | `--version` flag + `App version` line in `--dry-run` | Renat | [x] |
+| S12-06 | `docs/PROMPTS.md` — prompt book with rationale and iteration history | Alon | [x] |
+| S12-07 | Refresh `docs/PRD.md` / `docs/PLAN.md` / `docs/TODO.md` for v1.00 | Both | [x] |
+| S12-08 | English-only sweep across the repo (no Hebrew anywhere) | Both | [x] |
+
+---
+
+## Stage 13 — Strict 150-line file-size compliance
+
+Re-audit under the strict (raw lines, including blanks/comments) reading of Guidelines V3 §5.2. Five source files exceeded 150 raw lines and were split.
+
+| ID | Task | Owner | Status |
+|----|------|-------|--------|
+| S13-01 | Convert `debate/transport.py` (172) into a `debate/transport/` package: `base`, `file_queue`, `fifo`, `factory` | Renat | [x] |
+| S13-02 | Split `agents/parent_agent.py` (181) — extract `verdict_builder.py` and `judge_prompts.py` | Alon | [x] |
+| S13-03 | Split `legacy/session_loop.py` (164) — extract `ping_runner.py` | Renat | [x] |
+| S13-04 | Split `gui/app.py` (162) — extract `gui/env_check.py` (provider status + input validation) | Alon | [x] |
+| S13-05 | Split `gui/panels.py` (160) — extract `gui/form.py` (FormWidgets + build_form) | Renat | [x] |
+| S13-06 | Re-run pytest + ruff + file-size audit; all 91 tests pass, every file ≤ 138 raw lines | Both | [x] |
+| S13-07 | Update PRD / PLAN / TODO to use the strict raw-line rule and document the new modules | Both | [x] |
 
 ---
 
@@ -152,30 +211,37 @@ Status key: `[ ]` pending · `[~]` in progress · `[x]` done · `[-]` cancelled
 | Three agents, mediated flow | [x] |
 | JSON message protocol | [x] |
 | Python orchestrator | [x] |
-| Separate skills (Pro / Con / Parent) | [x] |
+| Project-local skills only (no global) | [x] |
+| Multi-skill debaters (argument-builder + rebuttal-strategist + lore) | [x] |
+| Parent skill stack (judge + host-protocol + rubric, research-backed) | [x] |
+| Host-style opening briefing per child | [x] |
+| Runtime side assignment by Parent (not hardcoded) | [x] |
+| Refute-with-citation rule enforced in prompts and rubric | [x] |
 | Internet citations in schema | [x] |
 | 10 pings/side (configurable) | [x] |
-| Gatekeeper | [x] (interval queue + denial logs) |
+| Gatekeeper (interval queue + denial logs) | [x] |
 | Watchdog hooks | [x] |
 | Rotating logs | [x] |
 | OOP + architecture diagram | [x] |
-| PRD / PLAN / TODO | [x] (Stage 1) |
+| PRD / PLAN / TODO / PROMPTS | [x] |
+| Mechanism PRDs (orchestrator / gatekeeper / SDK / judge rubric) | [x] |
 | Full run screenshots | [ ] add to assets/screenshots/ |
-| 85% coverage | [x] |
-| 150-line file limit | [ ] |
+| 85% coverage | [x] (88%) |
+| 150-line file limit (raw lines, strict) | [x] (largest 138) |
 | UV + uv.lock | [x] |
-| JSON config in `config/` | [x] |
+| JSON config in `config/` with `"version"` key + validator | [x] |
+| English-only project content | [x] |
 
 ---
 
-## How to commit each stage (local)
+## Remaining work for submission
 
-```powershell
-cd "<your-repo-path>"
-git status
-git add docs/
-git commit -m "docs: add PRD, PLAN, TODO and mechanism PRDs"
-git push
-```
+- **Screenshots:** capture terminal `--dry-run`, a live debate, GUI window, a verdict JSON file, and an excerpt of the rotating log. Place in `assets/screenshots/` and link from `README.md`.
+- **End-to-end run:** one full 10-ping run if Gemini quota permits, otherwise document the demo (5-ping) run.
+- **Moodle PDF:** each partner submits the same GitHub URL via Moodle (manual step).
 
-Or use VS Code **Source Control** → stage files → commit message → **Sync/Push**.
+## Optional extras (not required, may add submission polish)
+
+- `docs/DECISIONS.md` — running decision log distinct from PRD/PLAN.
+- `notebooks/analysis.ipynb` — sensitivity analysis (rubric weight sweep, pings-per-side effect on verdict).
+- Resume mechanism — recover a crashed session from the saved JSONL transcript instead of restarting.

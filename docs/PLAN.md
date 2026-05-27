@@ -1,9 +1,9 @@
 # Implementation Plan — AI Agent Debate
 
 **Project:** Exercise 02 — Intelligent Agents  
-**Version:** 1.00  
+**Version:** 1.00 (submission baseline)  
 **Authors:** Renat Karimov, Alon Engel  
-**Last updated:** 2026-05-21
+**Last updated:** 2026-05-27
 
 ---
 
@@ -135,9 +135,15 @@ classDiagram
         +build_turn(ping, opponent) DebateMessage
         +invoke_llm(user) str
     }
+    class DebaterAgent {
+        <<abstract>>
+        +apply_assignment(own_side, opponent_side)
+        +_resolved_sides() tuple
+    }
     class ProAgent
     class ConAgent
     class ParentAgent {
+        +apply_assignment(pro_side, con_side)
         +record_turn(msg)
         +build_verdict() VerdictMessage
     }
@@ -155,8 +161,9 @@ classDiagram
         +payload DebatePayload
     }
 
-    BaseAgent <|-- ProAgent
-    BaseAgent <|-- ConAgent
+    BaseAgent <|-- DebaterAgent
+    DebaterAgent <|-- ProAgent
+    DebaterAgent <|-- ConAgent
     BaseAgent <|-- ParentAgent
     ProcessDebateOrchestrator --> ParentAgent
     ProcessDebateOrchestrator --> Gatekeeper
@@ -177,6 +184,7 @@ Worker processes exchange **dict commands** (internal) and **Pydantic models** (
 |-------------------|-----------|---------|
 | `START` | Main → Parent | Begin debate loop |
 | `STOP` | Main → workers | Graceful shutdown |
+| `ASSIGN` | Parent → Pro/Con | `{own_side, opponent_side}` — runtime side assignment from `host_protocol.decide_sides`, sent once before any turn |
 | `TURN_REQUEST` | Parent → Pro/Con | `{ping, opponent_text}` |
 | `RELAY` | Parent → Pro/Con | Opponent's last message |
 | `DebateMessage` (JSON) | Pro/Con → Parent | Completed turn |
@@ -225,51 +233,83 @@ Public agent IPC (Exercise requirement) remains JSON `DebateMessage` / `VerdictM
 
 ### ADR-006: File length limit — split large modules
 
-**Status:** Planned  
-**Context:** Guidelines V3 — max 150 lines per code file.  
-**Decision:** Split `process_orchestrator.py`, `agents.py`, `gui.py`, `orchestrator.py` in Stages 3–4.  
-**Consequences:** More modules; clearer single responsibility.
+**Status:** Accepted  
+**Context:** Guidelines V3 §5.2 — max 150 raw lines per code file (strict count, including blanks and comments).  
+**Decision:** Split `process_orchestrator.py`, `agents.py`, `gui.py`, `orchestrator.py` in Stages 3–4. In Stage 13 we re-audited under the strict raw-line rule and split five more files: `transport.py` became a package, `parent_agent.py` extracted `verdict_builder.py` and `judge_prompts.py`, `legacy/session_loop.py` extracted `ping_runner.py`, `gui/app.py` extracted `env_check.py`, `gui/panels.py` extracted `form.py`.  
+**Consequences:** More modules; clearer single responsibility. Audited at v1.00 — every source file ≤ 138 raw lines (`config/loader.py` is the canary for the next split).
+
+### ADR-007: Runtime side assignment by the host
+
+**Status:** Accepted  
+**Context:** The exercise brief states that the debater's position must not be fixed in code — the host should hand it over in real time so the Parent visibly runs the debate.  
+**Decision:** `ProAgent` and `ConAgent` are pure role markers (no built-in side); `host_protocol.decide_sides(config, session_id)` chooses which option each defends. The choice is deterministic per `session_id` (replayable) but varies across sessions. The result travels to children in an `ASSIGN` command before the first turn, and the Parent records the same mapping for its verdict prompt.  
+**Consequences:** Tests can no longer assume "PRO = Godfather"; we added `tests/unit/test_host_protocol.py` to cover determinism, variability, and override paths.
+
+### ADR-008: Multi-skill debaters + lore-only side skills
+
+**Status:** Accepted  
+**Context:** In-class clarification: each debater should have more than one skill — one for building arguments, one for refuting the opponent — modelled on a legal team where each lawyer specialises.  
+**Decision:** Two generic, side-agnostic skills (`debate-argument-builder`, `debate-rebuttal-strategist`) carry the playbook; per-side skills (`debate-pro-godfather`, `debate-con-shawshank`) are now lore-only — curated facts and counter-points consumed by the generic skills. All skills live under `.claude/skills/` and are project-local (no global skills, per the exercise brief).  
+**Consequences:** Side knowledge can be swapped in for new topics without touching the playbook; debaters share refutation discipline regardless of side.
+
+### ADR-009: Research-backed judging rubric
+
+**Status:** Accepted  
+**Context:** The exercise brief says it is insufficient to declare the Parent "an expert" — its rubric must rest on published debate methodology.  
+**Decision:** The Parent skill stack (`debate-parent-judge` + `debate-host-protocol` + `debate-judge-rubric`) and the verdict prompt are grounded in WUDC, IDEA, NSDA and Alfred Snider's published criteria, decomposed into five principles (persuasion-not-truth, clash, refute-with-citation, dropped-arguments-stand, no-tie) and a five-axis scoring rubric (Matter 30 / Manner 15 / Method 15 / Clash 25 / Burden 15). Documented in `docs/PRD_judge_rubric.md`.  
+**Consequences:** Verdicts are auditable against a written rubric; `persuasion_notes` must reference at least one principle, which the prompt enforces.
+
+### ADR-010: Config version key validated at load
+
+**Status:** Accepted  
+**Context:** Submission Guidelines V3 §8.1 require an explicit version stamp in code and config and a runtime check that they agree.  
+**Decision:** `debate._version.__version__ = "1.00"` is the single source of truth; `setup.json`, `demo_setup.json`, `rate_limits.json`, and `demo_rate_limits.json` each carry a top-level `"version"` key. `debate.config.loader._validate_config_version` is called for both files inside `load_config`: missing key is a hard `ValueError`, mismatch is a warning so old configs still boot but the user is told.  
+**Consequences:** Submitted artifacts can be diffed by version at a glance; CI-style mistakes (forgotten config bump) surface immediately at startup.
 
 ---
 
-## 8. Directory structure
-
-### Current (Stage 4)
+## 8. Directory structure (v1.00)
 
 ```
+.claude/
+  skills/
+    debate-parent-judge/         # Parent: top-level role
+    debate-host-protocol/        # Parent: opening protocol + side assignment
+    debate-judge-rubric/         # Parent: scoring rubric
+    debate-argument-builder/     # Debaters: positive case (side-agnostic)
+    debate-rebuttal-strategist/  # Debaters: refutation rules (side-agnostic)
+    debate-pro-godfather/        # Debaters: lore-only side knowledge
+    debate-con-shawshank/        # Debaters: lore-only side knowledge
 config/
-src/debate/
-  orchestrator/     # multiprocess (production)
-  agents/           # pro, con, parent + JSON/LLM helpers
-  gui/              # optional Tkinter launcher
-  legacy/           # single-process reference orchestrator
-  agent_base.py
-  gatekeeper.py
-  ...
-tests/unit/
-tests/integration/
-assets/screenshots/
-docs/
-```
-
-### Target (after Stages 3–6)
-
-```
-config/
-  setup.json
-  rate_limits.json
+  setup.json                     # version, debate, llm, ipc, logging
+  demo_setup.json
+  rate_limits.json               # version + gatekeeper limits
+  demo_rate_limits.json
 src/
   debate/
-    orchestrator/   # split process modules
-    agents/
+    _version.py                  # __version__ = "1.00" (single source of truth)
+    agents/                      # parent, debater base, pro, con, prompts,
+                                 # judge_prompts, verdict_builder, verdict_llm
+    orchestrator/                # multiprocess workers + host_protocol
+    gui/                         # optional Tkinter launcher
+                                 #   app, layout, panels, form, env_check,
+                                 #   widgets, theme, runner
+    legacy/                      # single-process reference orchestrator
+                                 #   session_loop, ping_runner, setup, helpers
+    transport/                   # IPC transports
+                                 #   base, file_queue, fifo, factory
+    config/                      # JSON loader with version validation
     ...
-  sdk/
+  sdk/                           # provider facade + Gemini/Claude clients
 tests/
   unit/
   integration/
 assets/
   screenshots/
 docs/
+  PRD.md  PLAN.md  TODO.md  PROMPTS.md
+  PRD_orchestrator.md  PRD_gatekeeper.md  PRD_llm_sdk.md  PRD_judge_rubric.md
+  architecture.md  GEMINI_SETUP.md
 ```
 
 ---
@@ -291,7 +331,7 @@ docs/
 - **Session logs:** Rotating JSONL under `logs/` (`logging_setup.py`).
 - **Verdict artifact:** `logs/verdict_<session_id>.json`.
 - **GUI progress:** Event queue payloads (`kind`: `progress`, `llm_start`, `llm_done`, `ipc`, `error`).
-- **Future (Stage 9):** Prompt log file + token/cost summary in README.
+- **Prompt log:** `docs/PROMPTS.md` documents every LLM-facing prompt (rationale, schema, iteration history).
 
 ---
 
@@ -309,7 +349,9 @@ docs/
 |----------|-------------|
 | `PRD.md` | Product requirements |
 | `TODO.md` | Staged task tracker |
+| `PROMPTS.md` | Prompt book — every LLM-facing prompt, rationale, iteration history |
 | `PRD_orchestrator.md` | Orchestrator mechanism spec |
 | `PRD_gatekeeper.md` | Gatekeeper mechanism spec |
 | `PRD_llm_sdk.md` | LLM SDK mechanism spec |
+| `PRD_judge_rubric.md` | Research basis + skill architecture for Parent/Judge |
 | `architecture.md` | Original class diagram + layers |
