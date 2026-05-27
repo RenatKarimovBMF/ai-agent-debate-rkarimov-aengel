@@ -1,5 +1,12 @@
 # AI Agent Debate
 
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Tests](https://img.shields.io/badge/tests-185%20passing-brightgreen.svg)](#tests)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](pyproject.toml)
+[![Ruff](https://img.shields.io/badge/lint-ruff%20clean-brightgreen.svg)](https://docs.astral.sh/ruff/)
+[![Line cap](https://img.shields.io/badge/file%20size-%E2%89%A4%20150%20lines-brightgreen.svg)](scripts/check_line_cap.py)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 **Intelligent Agents — Exercise 02** · Haifa University  
 **Renat Karimov** & **Alon Engel**
 

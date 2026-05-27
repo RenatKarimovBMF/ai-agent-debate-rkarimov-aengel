@@ -9,6 +9,21 @@ Per submission guideline §8.1, the major version is bumped on breaking
 restructures; minor versions bring backwards-compatible additions;
 patches are bug fixes.
 
+## [Unreleased]
+
+### Added
+
+- **GitHub project boilerplate.** `LICENSE` (MIT, Renat Karimov and
+  Alon Engel, 2026); `.github/workflows/ci.yml` running ruff, the
+  150-line cap, and `pytest tests/unit --cov` on Python 3.11 / 3.12 /
+  3.13 on every push and PR to `main`; `.github/PULL_REQUEST_TEMPLATE.md`
+  with the local-gate checklist; `.github/ISSUE_TEMPLATE/{bug_report,idea}.md`
+  for structured triage; README badges (Python, tests, coverage, ruff,
+  line cap, license).
+- **Wider line-cap enforcement.** `scripts/check_line_cap.py` now walks
+  `src/`, `tests/`, **and** `scripts/`, so the 150-line rule cannot be
+  silently broken by a new test file or helper script.
+
 ## [1.00] — 2026-05-27
 
 The submission baseline. Stage 10–13 work folded in: research-backed
