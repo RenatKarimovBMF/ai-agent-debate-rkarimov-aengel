@@ -25,20 +25,43 @@ class ParentAgent(BaseAgent):
         self._pro = pro_channel
         self._con = con_channel
         self._history: list[str] = []
+        self._pro_side: str | None = None
+        self._con_side: str | None = None
+
+    def apply_assignment(self, *, pro_side: str, con_side: str) -> None:
+        """Record the runtime side mapping decided by `host_protocol`."""
+        self._pro_side = pro_side.strip() or None
+        self._con_side = con_side.strip() or None
+
+    def _assigned_sides(self) -> tuple[str, str]:
+        debate = self.config.debate
+        return (
+            self._pro_side or debate.pro_side,
+            self._con_side or debate.con_side,
+        )
 
     def system_prompt(self) -> str:
         debate = self.config.debate
+        pro_side, con_side = self._assigned_sides()
         return f"""You are the PARENT/JUDGE agent in a mediated AI debate.
 Topic: {debate.topic}
-Side PRO: {debate.pro_side}
-Side CON: {debate.con_side}
+PRO defends: {pro_side}
+CON defends: {con_side}
 
-Your job:
-1. Do not debate yourself.
-2. Judge persuasion quality, direct rebuttal quality, clarity, and source use.
-3. Do NOT judge only factual correctness.
-4. You MUST NOT declare a tie. Pick exactly one winner: "pro" or "con".
-5. Scores must be different, and the winner must have the higher score.
+The sides were assigned by you at runtime — they are not facts about the
+world. Judge persuasion, not which side is "really" true.
+
+Judging principles (research-backed; see .claude/skills/debate-parent-judge):
+1. Persuasion, not truth. A well-defended falsehood beats a poorly
+   defended truth. The exception is the "refute-with-citation" rule: a
+   debater alleging a falsehood must cite a real source in the same turn,
+   or the allegation does not count and is penalised.
+2. Clash matters. Reward direct engagement with the opponent's last
+   point; penalise debaters who run their own talking points and ignore
+   the opponent.
+3. Dropped arguments stand. If a claim went unanswered for two
+   consecutive turns, treat it as conceded for scoring.
+4. No tie. Scores must differ; the winner has the strictly higher score.
 
 Important JSON rules:
 - Output exactly one JSON object.
@@ -70,31 +93,39 @@ When asked for the final verdict, output ONLY valid JSON:
         return channel.child_to_parent.read(timeout=timeout)
 
     def record_turn(self, message: DebateMessage) -> None:
-        side = message.from_role.value.upper()
+        role_label = message.from_role.value.upper()
+        pro_side, con_side = self._assigned_sides()
+        defending = pro_side if message.from_role == AgentRole.PRO else con_side
         citations = ", ".join(c.url for c in message.payload.citations) or "no citations"
 
         self._history.append(
-            f"[{side} ping={message.payload.ping_number}] {message.payload.text}\n"
-            f"Sources: {citations}"
+            f"[{role_label} defending '{defending}' ping={message.payload.ping_number}] "
+            f"{message.payload.text}\nSources: {citations}"
         )
 
     def render_verdict(self) -> VerdictMessage:
         transcript = "\n\n".join(self._history[-80:])
+        pro_side, con_side = self._assigned_sides()
 
         prompt = f"""
 The debate is complete.
 
-Declare exactly one winner by persuasion skill.
-No tie is allowed.
+PRO defended: {pro_side}
+CON defended: {con_side}
 
-Judge according to:
-1. direct rebuttal quality
-2. clarity
-3. respectful tone
-4. citation/source use
-5. persuasiveness
+Apply the rubric from .claude/skills/debate-judge-rubric to score each
+side across Matter (30), Manner (15), Method (15), Clash (25), and
+Burden (15). Sum to a 0-100 total per side.
 
-Do not judge only factual correctness.
+Then apply the five judging principles from
+.claude/skills/debate-parent-judge:
+1. Persuasion, not truth.
+2. Clash matters; reward direct engagement.
+3. Refuting a lie requires a cited source; bare contradictions do not
+   count and are penalised.
+4. Dropped arguments stand.
+5. No tie permitted — break ties by higher Clash, then fewer dropped
+   claims.
 
 Transcript:
 {transcript}
@@ -111,6 +142,7 @@ Rules:
 - pro_score and con_score must be numbers between 0 and 100
 - scores must be different
 - the winner must have the higher score
+- persuasion_notes must reference at least one of the five principles above
 """
 
         data = invoke_and_parse_verdict_with_retry(self, prompt)
