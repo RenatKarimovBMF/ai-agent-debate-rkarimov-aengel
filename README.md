@@ -192,18 +192,25 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 | Gatekeeper + watchdog + JSONL logs | `debate/gatekeeper/`, `logs/` |
 | OOP + architecture diagram | [docs/architecture.md](docs/architecture.md) |
 | PRD / PLAN / TODO | [docs/](docs/) |
-| Tests + 85% coverage | `uv run pytest --cov` |
+| ADRs (per architectural decision) | [docs/adr/](docs/adr/) |
+| Prompt book (every LLM-facing prompt) | [docs/PROMPTS.md](docs/PROMPTS.md) |
+| Tests + 100% coverage on in-scope code | 187 tests · `uv run pytest --cov` |
+| Strict 150-line cap per `.py` file | `uv run python scripts/check_line_cap.py` |
+| CI (ruff + cap + tests on Python 3.11 / 3.12 / 3.13) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
+| Version tracking (code + config in lock-step) | `__version__` + `version` key validated at load |
 | UV + `uv.lock`, JSON config | `config/setup.json` |
 
-**Quality checks:**
+**Quality checks (the same gate CI runs):**
 
 ```powershell
-uv run ruff check src tests
-uv run pytest
-uv run pytest --cov
+uv run python scripts/check_line_cap.py    # every .py <= 150 raw lines
+uv run ruff check src tests scripts        # zero violations
+uv run pytest --cov                        # 187 tests, fail_under = 100%
 ```
 
-**Docs:** [PRD](docs/PRD.md) · [PLAN](docs/PLAN.md) · [Architecture](docs/architecture.md) · [Gemini setup](docs/GEMINI_SETUP.md)
+Or `make check` for all three in one go.
+
+**Docs:** [PRD](docs/PRD.md) · [PLAN](docs/PLAN.md) · [Architecture](docs/architecture.md) · [Gemini setup](docs/GEMINI_SETUP.md) · [Prompts](docs/PROMPTS.md) · [Known limitations](docs/KNOWN_LIMITATIONS.md) · [Changelog](CHANGELOG.md) · [ADRs](docs/adr/)
 
 ---
 
@@ -244,4 +251,5 @@ Posters in `assets/posters/` are used for educational illustration (Wikipedia fi
 
 ## License
 
-Academic project — Haifa University, Intelligent Agents, Exercise 02.
+Released under the [MIT License](LICENSE).
+Academic project for Haifa University, Intelligent Agents course, Exercise 02.
