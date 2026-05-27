@@ -68,7 +68,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"LLM provider: {client.active_provider()}")
         print(f"Topic: {config.debate.topic}")
         print(f"Pings per side: {config.debate.pings_per_side}")
-        print(f"Pro: {config.debate.pro_side} | Con: {config.debate.con_side}")
+        print(
+            f"Options on the table: {config.debate.pro_side} | {config.debate.con_side}"
+        )
+        print(
+            "Side assignment: decided by Parent/Judge at session start "
+            "(seeded by session_id; not hardcoded)."
+        )
         print("Execution mode: real multiprocessing agents")
         return 0
 

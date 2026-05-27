@@ -6,7 +6,7 @@ import multiprocessing as mp
 from debate.config import AppConfig
 from debate.logging_setup import setup_logging
 from debate.models import AgentRole, DebateMessage
-from debate.orchestrator.commands import RELAY, STOP, TURN_REQUEST, worker_error
+from debate.orchestrator.commands import ASSIGN, RELAY, STOP, TURN_REQUEST, worker_error
 from debate.orchestrator.events import emit_event
 from debate.orchestrator.factory import create_child_agent
 
@@ -41,6 +41,23 @@ def child_worker(
             if command_type == STOP:
                 emit_event(event_queue, f"{role.value.upper()} PROCESS: stopping", kind="process")
                 break
+
+            if command_type == ASSIGN:
+                assigned = str(command.get("assigned_side", ""))
+                opponent = str(command.get("opponent_side", ""))
+                agent.apply_assignment(assigned, opponent)
+                emit_event(
+                    event_queue,
+                    f"{role.value.upper()} PROCESS: received host assignment — "
+                    f"defending '{assigned}' vs '{opponent}'",
+                    kind="host",
+                    data={
+                        "role": role.value,
+                        "assigned_side": assigned,
+                        "opponent_side": opponent,
+                    },
+                )
+                continue
 
             if command_type == RELAY:
                 relayed = DebateMessage.model_validate(command["message"])

@@ -133,8 +133,8 @@ class DebateGui(tk.Tk):
         self._log("")
         self._log("--- New debate started ---")
         self._log(f"Question: {topic}")
-        self._log(f"PRO: {pro}")
-        self._log(f"CON: {con}")
+        self._log(f"Options offered to host: {pro}  |  {con}")
+        self._log("(The Parent/Judge assigns each side to a corner at session start.)")
         self._log("Live process logs will appear below: supervisor → parent → pro/con → parent.")
 
         start_debate_thread(
