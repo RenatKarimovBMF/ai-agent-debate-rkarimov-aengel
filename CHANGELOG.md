@@ -24,6 +24,18 @@ patches are bug fixes.
   `src/`, `tests/`, **and** `scripts/`, so the 150-line rule cannot be
   silently broken by a new test file or helper script.
 
+### Changed
+
+- **Quality-gate scope aligned across CI / Makefile / docs.** Ruff,
+  the line-cap script, and `pytest --cov` now all walk
+  `src/ tests/ scripts/` (Makefile `lint`/`format`, pre-commit, CI
+  workflow). The CI step that ran only `tests/unit` now runs the full
+  suite — the two integration tests under `tests/integration/` are
+  config-scaffold tests and never touch Gemini or Anthropic.
+- **Documentation counts refreshed.** README badge, `CONTRIBUTING.md`
+  gate snippet, and PR-template checklist updated to the actual figures
+  (187 tests; `fail_under = 100`).
+
 ## [1.00] — 2026-05-27
 
 The submission baseline. Stage 10–13 work folded in: research-backed

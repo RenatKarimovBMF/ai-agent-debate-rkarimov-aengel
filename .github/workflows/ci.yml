@@ -3,12 +3,15 @@
 # Mirrors the gates required by Exercise 02 / Guidelines V3:
 #   - ruff is clean (zero violations) on src/, tests/, scripts/
 #   - every .py under src/, tests/, scripts/ is <= 150 raw lines (NFR-01)
-#   - pytest tests/unit passes with fail_under = 100 on in-scope code
-#   - the CLI dry-run prints a healthy banner without contacting an LLM
+#   - pytest (full unit + integration suite) passes with
+#     fail_under = 100 on in-scope code
+#   - the CLI --version / --help smoke commands return zero without
+#     contacting an LLM
 #
-# Integration tests under tests/integration/ are intentionally skipped
-# here: they require real GEMINI_API_KEY / ANTHROPIC_API_KEY values and
-# spawn child processes that the public CI runner cannot reach.
+# The integration tests under tests/integration/ are config-scaffold
+# tests only; they exercise load_config() against the checked-in JSON
+# files and never call out to Gemini or Anthropic, so they are safe to
+# run on the public runner.
 
 name: CI
 
@@ -53,8 +56,8 @@ jobs:
       - name: Lint (ruff)
         run: uv run ruff check src/ tests/ scripts/
 
-      - name: Unit tests with coverage gate (fail_under = 100)
-        run: uv run pytest tests/unit --cov --cov-report=term --cov-report=xml
+      - name: Tests with coverage gate (fail_under = 100)
+        run: uv run pytest --cov --cov-report=term --cov-report=xml
 
       - name: Upload coverage XML
         if: matrix.python-version == '3.12'

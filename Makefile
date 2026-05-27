@@ -19,7 +19,7 @@ help: ## show this help
 	@echo "  test-cov       run the pytest suite with coverage report"
 	@echo "  lint           run ruff in check mode"
 	@echo "  format         run ruff in fix-and-format mode"
-	@echo "  cap            verify every src/.py file is <= 150 raw lines"
+	@echo "  cap            verify every .py file in src/tests/scripts is <= 150 raw lines"
 	@echo "  check          run lint + cap + test-cov (the full local gate)"
 	@echo "  ci             alias for check, intended for CI"
 	@echo ""
@@ -43,11 +43,11 @@ test-cov: ## run the pytest suite with coverage
 	uv run pytest --cov
 
 lint: ## ruff check
-	uv run ruff check src tests
+	uv run ruff check src tests scripts
 
 format: ## ruff fix + format
-	uv run ruff check --fix src tests
-	uv run ruff format src tests
+	uv run ruff check --fix src tests scripts
+	uv run ruff format src tests scripts
 
 cap: ## verify the 150-line raw-line file cap
 	uv run python scripts/check_line_cap.py 150

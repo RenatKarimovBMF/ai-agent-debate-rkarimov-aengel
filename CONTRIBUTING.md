@@ -51,11 +51,11 @@ Copy `.env.example` to `.env` and fill in at least one of
 ## Quality gates (run them before pushing)
 
 ```
-uv run ruff check src tests          # zero violations
-uv run pytest                        # 91 tests, fail_under = 85% coverage
+uv run ruff check src tests scripts  # zero violations
+uv run pytest --cov                  # 187 tests, fail_under = 100% on in-scope code
 uv run python -m debate.main --dry-run --config config/setup.json
                                      # the CLI must still load
-make cap                             # every .py source file <= 150 lines
+make cap                             # every .py file under src/tests/scripts <= 150 lines
 ```
 
 The same checks are wrapped behind `make check` (see `Makefile`). A
