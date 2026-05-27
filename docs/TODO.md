@@ -188,6 +188,24 @@ Triggered by the in-class clarifications: project-local skills only, research-ba
 
 ---
 
+## Stage 14 — Repo hygiene boilerplate and 100% coverage
+
+Final pre-submission polish: align the project with Software Submission Guidelines V3 §2.1 (contribution guidelines), §2.2 (ADRs), and §6.2 (coverage gate). Also adopt the patterns from the updated first-exercise repo (Makefile, pre-commit hooks, KNOWN_LIMITATIONS, CHANGELOG, AUTHORS, CONTRIBUTING, per-ADR files).
+
+| ID | Task | Owner | Status |
+|----|------|-------|--------|
+| S14-01 | `AUTHORS.md` and `CONTRIBUTING.md` at repo root | Renat | [x] |
+| S14-02 | `CHANGELOG.md` (Keep-a-Changelog) with v1.00 entry | Alon | [x] |
+| S14-03 | `Makefile` wrapping `uv` commands (`make check`, `make run`, `make ci`, ...) | Renat | [x] |
+| S14-04 | `.pre-commit-config.yaml` + `scripts/check_line_cap.py` | Alon | [x] |
+| S14-05 | `docs/KNOWN_LIMITATIONS.md` (nine L-01..L-09 design choices) | Renat | [x] |
+| S14-06 | `docs/adr/` split into ten per-decision files (Michael Nygard template) | Alon | [x] |
+| S14-07 | `pyproject.toml` coverage scope + `fail_under = 100` | Renat | [x] |
+| S14-08 | Targeted `tests/unit/test_*_coverage.py` files (one per module) cover every remaining branch under the 150-line cap | Alon | [x] |
+| S14-09 | Coverage = 100% on in-scope code (185 unit tests) | Both | [x] |
+
+---
+
 ## Stage 13 — Strict 150-line file-size compliance
 
 Re-audit under the strict (raw lines, including blanks/comments) reading of Guidelines V3 §5.2. Five source files exceeded 150 raw lines and were split.
@@ -226,7 +244,7 @@ Re-audit under the strict (raw lines, including blanks/comments) reading of Guid
 | PRD / PLAN / TODO / PROMPTS | [x] |
 | Mechanism PRDs (orchestrator / gatekeeper / SDK / judge rubric) | [x] |
 | Full run screenshots | [ ] add to assets/screenshots/ |
-| 85% coverage | [x] (88%) |
+| 85% coverage | [x] (100% on in-scope code; gate at 100) |
 | 150-line file limit (raw lines, strict) | [x] (largest 138) |
 | UV + uv.lock | [x] |
 | JSON config in `config/` with `"version"` key + validator | [x] |
