@@ -217,15 +217,28 @@ Or `make check` for all three in one go.
 ## Project layout
 
 ```
-ai-agent-debate-karimov-engel/
-├── config/              setup.json, rate_limits.json (+ demo variants)
-├── src/debate/          orchestrator, agents, gatekeeper, optional GUI
-├── src/sdk/             Gemini / Claude LLM clients
-├── tests/               unit + integration (85%+ coverage)
-├── assets/posters/      README movie art
-├── assets/screenshots/  submission captures
-├── .claude/skills/      manual Stage 1–2 agent skills
-└── logs/                JSONL logs + verdict_*.json (local, gitignored)
+ai-agent-debate-rkarimov-aengel/
+├── config/                 setup.json, rate_limits.json (+ demo variants, version-stamped)
+├── src/debate/             orchestrator, agents, gatekeeper, transport, GUI, watchdog
+├── src/sdk/                Gemini / Anthropic / Claude-CLI LLM clients
+├── tests/unit/             185 targeted unit tests (each *_coverage.py < 150 lines)
+├── tests/integration/      2 config-scaffold tests
+├── scripts/                check_line_cap.py (150-line gate)
+├── docs/                   PRD, PLAN, TODO, PROMPTS, KNOWN_LIMITATIONS, architecture
+├── docs/adr/               10 architectural decision records + index
+├── .claude/skills/         project-local agent skills (debaters + parent/judge)
+├── .github/                CI workflow + PR/issue templates
+├── assets/posters/         README movie art
+├── assets/screenshots/     submission captures
+├── logs/                   JSONL logs + verdict_*.json (local, gitignored)
+├── AUTHORS.md              team
+├── CHANGELOG.md            Keep-a-Changelog (v1.00 baseline)
+├── CONTRIBUTING.md         dev workflow + quality gates
+├── LICENSE                 MIT
+├── Makefile                uv wrappers (install / test / lint / cap / check / run / gui)
+├── .pre-commit-config.yaml ruff + line-cap on every commit
+├── pyproject.toml          dependencies + coverage gate (fail_under = 100)
+└── uv.lock                 pinned dependency graph
 ```
 
 ---
