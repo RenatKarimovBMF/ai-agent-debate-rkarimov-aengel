@@ -79,12 +79,12 @@ Each debater uses up to three project-local skills:
 - **`debate-rebuttal-strategist`** — side-agnostic refutation, including
   the hard rule that alleging a falsehood requires a cited source in the
   same turn.
-- **`debate-pro-godfather`** / **`debate-con-shawshank`** — topic-knowledge
-  layer with curated facts and counter-moves, used only when the topic is
-  the Godfather-vs-Shawshank question.
+- **`debate-evidence`** — side-agnostic, topic-agnostic sourcing skill:
+  how to find concrete, citeable evidence and weigh/turn sources for any
+  assigned side and topic. It supplies no hardcoded facts.
 
-The first two are independent of which side the debater defends — the
-side is assigned by the Parent at runtime via `debate-host-protocol`.
+All three are independent of which side the debater defends — the side is
+assigned by the Parent at runtime via `debate-host-protocol`.
 
 ## 6. Why this satisfies the course requirements
 

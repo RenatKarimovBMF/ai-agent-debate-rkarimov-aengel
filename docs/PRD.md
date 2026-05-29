@@ -57,7 +57,7 @@ Sides are no longer hardcoded to a class — the Parent assigns them at the star
 
 - **FR-01:** Exactly three agents in the public interface: Parent (judge/host), Pro, Con. Internal helper skills are allowed under the Parent.
 - **FR-02:** Pro and Con must **never** communicate directly; all messages pass through Parent.
-- **FR-03:** Each agent has dedicated project-local skills under `.claude/skills/` (no global skills). Debaters share two generic skills (`debate-argument-builder`, `debate-rebuttal-strategist`) and one side-specific lore skill (`debate-pro-godfather` or `debate-con-shawshank`).
+- **FR-03:** Each agent has dedicated project-local skills under `.claude/skills/` (no global skills). Debaters share three generic, topic-agnostic skills (`debate-argument-builder`, `debate-rebuttal-strategist`, `debate-evidence`); no skill hardcodes topic facts — debaters source their own evidence at runtime.
 - **FR-04:** Parent delivers a final **verdict** with winner, scores, and rationale (no tie allowed). Verdict reasoning must reference at least one of the five judging principles from `.claude/skills/debate-parent-judge`.
 
 ### 4.2 Debate flow
@@ -160,4 +160,4 @@ Sides are no longer hardcoded to a class — the Parent assigns them at the star
 - Prior feedback — `Detailed_Feedback_Report_252586.pdf`
 - Mechanism PRDs: `PRD_orchestrator.md`, `PRD_gatekeeper.md`, `PRD_llm_sdk.md`, `PRD_judge_rubric.md`
 - Prompt book: `PROMPTS.md`
-- Skills (project-local): `.claude/skills/debate-parent-judge`, `debate-host-protocol`, `debate-judge-rubric`, `debate-argument-builder`, `debate-rebuttal-strategist`, `debate-pro-godfather`, `debate-con-shawshank`
+- Skills (project-local): `.claude/skills/debate-parent-judge`, `debate-host-protocol`, `debate-judge-rubric`, `debate-argument-builder`, `debate-rebuttal-strategist`, `debate-evidence`

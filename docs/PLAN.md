@@ -249,7 +249,7 @@ Public agent IPC (Exercise requirement) remains JSON `DebateMessage` / `VerdictM
 
 **Status:** Accepted  
 **Context:** In-class clarification: each debater should have more than one skill — one for building arguments, one for refuting the opponent — modelled on a legal team where each lawyer specialises.  
-**Decision:** Two generic, side-agnostic skills (`debate-argument-builder`, `debate-rebuttal-strategist`) carry the playbook; per-side skills (`debate-pro-godfather`, `debate-con-shawshank`) are now lore-only — curated facts and counter-points consumed by the generic skills. All skills live under `.claude/skills/` and are project-local (no global skills, per the exercise brief).  
+**Decision:** Three generic, side-agnostic and topic-agnostic skills (`debate-argument-builder`, `debate-rebuttal-strategist`, `debate-evidence`) carry the debater playbook; no skill hardcodes topic facts (debaters source their own evidence at runtime — see ADR-008 Update 2026-05-30). All skills live under `.claude/skills/` and are project-local (no global skills, per the exercise brief).  
 **Consequences:** Side knowledge can be swapped in for new topics without touching the playbook; debaters share refutation discipline regardless of side.
 
 ### ADR-009: Research-backed judging rubric
@@ -278,8 +278,7 @@ Public agent IPC (Exercise requirement) remains JSON `DebateMessage` / `VerdictM
     debate-judge-rubric/         # Parent: scoring rubric
     debate-argument-builder/     # Debaters: positive case (side-agnostic)
     debate-rebuttal-strategist/  # Debaters: refutation rules (side-agnostic)
-    debate-pro-godfather/        # Debaters: lore-only side knowledge
-    debate-con-shawshank/        # Debaters: lore-only side knowledge
+    debate-evidence/             # Debaters: generic, topic-agnostic sourcing
 config/
   setup.json                     # version, debate, llm, ipc, logging
   demo_setup.json

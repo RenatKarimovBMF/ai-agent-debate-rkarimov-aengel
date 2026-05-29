@@ -32,9 +32,9 @@ just decoration.
 - **Skill files it pairs with**:
   `.claude/skills/debate-argument-builder/SKILL.md` (positive case
   scaffolding), `.claude/skills/debate-rebuttal-strategist/SKILL.md`
-  (refutation rules), and one of the two lore skills
-  (`debate-pro-godfather` or `debate-con-shawshank`) depending on the
-  side the host assigns.
+  (refutation rules), and `.claude/skills/debate-evidence/SKILL.md`
+  (generic, topic-agnostic sourcing — the debater finds its own
+  evidence; nothing is hardcoded).
 
 ### Why each block is there
 

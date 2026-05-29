@@ -117,19 +117,22 @@ architecture the assignment asks for.
   Not done because the prompt-level rule was empirically enough
   across our test sessions.
 
-## L-09: Skills are project-local Markdown only
+## L-09: Non-Claude providers receive skills by prompt injection
 
-- **Description:** the seven skills under `.claude/skills/` are
-  loaded by the Claude CLI when it boots a child process. They are
-  not used by the Gemini path — Gemini sees only the Python-side
-  prompts in `agents/prompts.py` and `agents/judge_prompts.py`.
-- **Impact:** the Parent's research-backed rubric is fully captured
-  in the Python prompts (so Gemini gets it too), but smaller skill
-  details (e.g. CWI-S argument structure for debaters) only land in
-  the Claude CLI runs.
-- **Workaround:** the skill files are short and could be inlined into
-  the Python prompts if you need full parity with Gemini. We kept
-  them in Markdown because they are easier to iterate on as text.
+- **Description:** the six skills under `.claude/skills/` (PRD FR-03)
+  are loaded **natively by the Claude CLI**. The **Gemini** and
+  **Anthropic API** paths do not read `.claude/`, so `debate/skills.py`
+  reads the same files and appends the role's skills to the system
+  prompt for those providers (`_INJECTED_PROVIDERS`). All three current
+  providers therefore apply the full skill set.
+- **Impact:** the injected providers pay a few KB of extra prompt tokens
+  per call (the Claude CLI loads skills more efficiently). A brand-new
+  provider would not get the skills until it is added to
+  `_INJECTED_PROVIDERS` in `debate/skills.py`.
+- **Workaround:** `.claude/skills/` stays the single source of truth
+  (no duplication); adding a provider to `_INJECTED_PROVIDERS` is a
+  one-line change. To trim tokens, inject a condensed summary per skill
+  instead of the full body.
 
 ## L-10: Free-tier Gemini produces lower-fidelity debates
 

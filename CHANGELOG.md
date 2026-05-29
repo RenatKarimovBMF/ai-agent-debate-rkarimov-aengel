@@ -17,6 +17,12 @@ repo/CI hygiene.
 
 ### Added
 
+- **Cross-provider skill parity.** `debate/skills.py` reads the project
+  skills under `.claude/skills/` and appends the role-appropriate ones to
+  the system prompt for the providers that don't load them natively —
+  **Gemini and the Anthropic API** (`_INJECTED_PROVIDERS`). The Claude
+  CLI already loads them, so it is skipped. `.claude/skills/` stays the
+  single source of truth (no duplication). See KNOWN_LIMITATIONS L-09.
 - **GitHub project boilerplate.** `LICENSE` (MIT, Renat Karimov and
   Alon Engel, 2026); `.github/workflows/ci.yml` running ruff, the
   150-line cap, and `pytest tests/unit --cov` on Python 3.11 / 3.12 /
@@ -57,6 +63,13 @@ repo/CI hygiene.
 
 ### Changed
 
+- **Debater skills are now fully generic (no hardcoded topic lore).**
+  Removed the two film-specific lore skills (`debate-pro-godfather`,
+  `debate-con-shawshank`) and replaced them with one side-agnostic,
+  topic-agnostic `debate-evidence` skill that teaches sourcing/citation
+  rather than supplying facts. Debaters now use three generic skills and
+  source their own evidence at runtime, so any `--topic` works without
+  authoring new skills. See ADR-008 (updated).
 - **Provider auto-priority reordered to `claude_cli → anthropic → gemini`.**
   When `LLM_PROVIDER=auto`, the SDK now prefers the Claude CLI (a
   Claude Pro/Max subscription, detected via `ClaudeAgentClient.available()`)
@@ -97,11 +110,12 @@ tracking, and the strict 150-line file cap.
   judging principles drawn from WUDC, IDEA, NSDA, and Alfred Snider),
   `debate-host-protocol` (boxing-referee opening + side assignment),
   and `debate-judge-rubric` (Matter 30 / Manner 15 / Method 15 /
-  Clash 25 / Burden 15 = 100). Debaters now share two side-agnostic
-  playbook skills (`debate-argument-builder`, `debate-rebuttal-strategist`)
-  with the per-side knowledge slimmed to lore-only skills
-  (`debate-pro-godfather`, `debate-con-shawshank`). All skills are
-  project-local under `.claude/skills/`. See `docs/PRD_judge_rubric.md`.
+  Clash 25 / Burden 15 = 100). Debaters share three generic,
+  topic-agnostic skills (`debate-argument-builder`,
+  `debate-rebuttal-strategist`, `debate-evidence`) — no skill hardcodes
+  topic facts; debaters source their own evidence at runtime. All skills
+  are project-local under `.claude/skills/`. See `docs/PRD_judge_rubric.md`
+  and ADR-008.
 - **Runtime side assignment (Stage 11).** The Parent decides which
   agent defends which side at session start via
   `debate.orchestrator.host_protocol.decide_sides`, deterministic per

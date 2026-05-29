@@ -46,7 +46,8 @@ class ParentAgent(BaseAgent):
 
     def system_prompt(self) -> str:
         pro_side, con_side = self._assigned_sides()
-        return judge_system_prompt(self.config.debate.topic, pro_side, con_side)
+        base = judge_system_prompt(self.config.debate.topic, pro_side, con_side)
+        return base + self.skill_suffix()
 
     def relay_to_child(self, message: DebateMessage, target: AgentRole) -> None:
         relay = message.model_copy(

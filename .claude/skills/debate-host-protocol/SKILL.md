@@ -21,9 +21,9 @@ At the very start of a session, **before ping 1**, exactly once.
 
 | Field | Source | Example |
 |-------|--------|---------|
-| `topic` | from the orchestrator's config | "Which is the greater film: The Godfather (1972) or The Shawshank Redemption (1994)?" |
-| `option_a` | from the topic | "The Godfather" |
-| `option_b` | from the topic | "The Shawshank Redemption" |
+| `topic` | from the orchestrator's config | the debate question (any topic) |
+| `option_a` | from the topic | the first side to defend |
+| `option_b` | from the topic | the opposing side |
 | `pings_per_side` | from the orchestrator's config | 10 |
 | `max_words_per_turn` | from the orchestrator's config | 280 |
 
@@ -73,10 +73,10 @@ You then send each child its personalised assignment.
 
 ## Sample opening text (host's narration, logged to transcript)
 
-> "Pro corner — you defend **The Godfather**. Con corner — you defend **The
-> Shawshank Redemption**. You will speak through me, not to each other.
-> Each turn is capped at 280 words and must include one cited source. You
-> may stretch the truth, but if you call your opponent a liar you bring
+> "Pro corner — you defend **<option A>**. Con corner — you defend
+> **<option B>**. You will speak through me, not to each other. Each turn
+> is capped at 280 words and must include one cited source. You may
+> stretch the truth, but if you call your opponent a liar you bring
 > evidence. Touch gloves. Round one — Pro, you open."
 
 You may shorten or rephrase, but the **rules block** and **side

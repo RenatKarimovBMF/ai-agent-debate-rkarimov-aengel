@@ -36,13 +36,14 @@ class DebaterAgent(BaseAgent):
 
     def system_prompt(self) -> str:
         own_side, opponent_side = self._resolved_sides()
-        return debater_prompt(
+        base = debater_prompt(
             role=self.role.value.upper(),
             topic=self.config.debate.topic,
             own_side=own_side,
             opponent_side=opponent_side,
             max_words=self.config.debate.max_words_per_turn,
         )
+        return base + self.skill_suffix()
 
     def build_turn(self, ping: int, opponent_text: str | None) -> DebateMessage:
         own_side, opponent_side = self._resolved_sides()

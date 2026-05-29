@@ -19,8 +19,9 @@ the agent calls rebuttal first and argument-builder second.
 - `ping_number` — which round (1-indexed).
 - `pings_per_side` — total rounds.
 - `max_words_per_turn` — usually 280.
-- (Optional) topic-specific knowledge skill (e.g. `debate-pro-godfather` or
-  `debate-con-shawshank`) for lore-level facts.
+- `debate-evidence` — the side-agnostic skill for sourcing concrete,
+  citeable evidence for your assigned side (you find it yourself; nothing
+  is hardcoded).
 
 ## The CWI-S structure (Claim, Warrant, Impact, Source)
 
@@ -28,8 +29,8 @@ Every argument must have:
 
 1. **Claim** — one sentence stating what is true.
 2. **Warrant** — *why* it is true (the reasoning, not just an assertion).
-3. **Impact** — why it should matter to the judge under the
-   "greater film" / "better policy" / whatever value framework you set.
+3. **Impact** — why it should matter to the judge under the value
+   framework you set (whatever standard decides *this* topic).
 4. **Source** — one credible web citation supporting any factual element.
 
 If a turn presents two arguments, each gets its own CWI-S block.
@@ -38,7 +39,7 @@ If a turn presents two arguments, each gets its own CWI-S block.
 
 | Ping | What to do |
 |-----:|------------|
-| 1 | **Frame the debate.** State the value standard ("greatness in cinema means cultural endurance + artistic ambition + influence"). Open with your single strongest argument under that frame. |
+| 1 | **Frame the debate.** State the value standard that should decide the topic (for a comparison, define what "greater"/"better" means; for a proposition, the key criterion). Open with your single strongest argument under that frame. |
 | 2–3 | **Extend** with two new arguments. Do not just repeat ping 1. |
 | 4–7 | **Develop depth.** Add evidence to existing arguments, introduce one new angle per ping. |
 | 8–9 | **Weighing.** Compare your arguments against the opponent's framework. Explain why your wins matter more. |
@@ -46,8 +47,8 @@ If a turn presents two arguments, each gets its own CWI-S block.
 
 ## Framing tactics
 
-- **Set the standard, don't fight on theirs.** If you control what
-  "greater" means, you control the round.
+- **Set the standard, don't fight on theirs.** If you control the
+  criterion that decides the topic, you control the round.
 - **Concede the smallest possible point** to look reasonable. Never concede
   the resolution.
 - **Use sources that the opponent cannot easily contest** — major

@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from debate.config import AppConfig
 from debate.gatekeeper import Gatekeeper
 from debate.models import AgentRole, DebateMessage
+from debate.skills import skill_suffix_for_provider
 from debate.transport import ChannelPair
 from sdk.llm_client import LlmClient
 
@@ -34,6 +35,19 @@ class BaseAgent(ABC):
 
     @abstractmethod
     def system_prompt(self) -> str: ...
+
+    def _active_provider(self) -> str:
+        """Best-effort name of the provider that will serve this agent."""
+        try:
+            provider = self.client.active_provider()
+        except Exception:
+            return ""
+        return provider if isinstance(provider, str) else ""
+
+    def skill_suffix(self) -> str:
+        """Skill block to append to the system prompt for providers that
+        don't load `.claude/skills/` natively (Gemini, Anthropic API)."""
+        return skill_suffix_for_provider(self._active_provider(), self.role)
 
     def next_turn_id(self) -> int:
         self._turn += 1
