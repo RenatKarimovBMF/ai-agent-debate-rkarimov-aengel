@@ -7,6 +7,6 @@ their top-level "version" key so the loader can validate that code and
 config are in sync at startup.
 """
 
-__version__ = "1.00"
+__version__ = "1.10"
 
 EXPECTED_CONFIG_VERSION = __version__

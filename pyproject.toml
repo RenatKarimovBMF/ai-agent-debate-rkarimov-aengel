@@ -1,6 +1,6 @@
 [project]
 name = "ai-agent-debate"
-version = "1.00"
+version = "1.10"
 description = "Exercise 02 — mediated AI debate: The Godfather vs The Shawshank Redemption"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -25,7 +25,7 @@ class _StubAgent(BaseAgent):
 
 
 def test_version_exposed_at_package_root():
-    assert __version__ == "1.00"
+    assert __version__ == "1.10"
 
 
 def test_project_root_is_repo_root():
