@@ -11,6 +11,7 @@ htmlcov/
 coverage.xml
 logs/*.log
 logs/*.jsonl
+logs/verdict_*.json
 fifo/*
 !fifo/.gitkeep
 !logs/.gitkeep
