@@ -17,7 +17,24 @@ from debate.config.loader import (
 from debate.config.loader import (
     resolve_setup_path,
 )
-from debate.env_loader import ensure_env_loaded, gemini_key_hint
+from debate.env_loader import ensure_env_loaded, find_project_root, gemini_key_hint
+
+
+def test_find_project_root_prefers_cwd_with_markers(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text("", encoding="utf-8")
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "setup.json").write_text("{}", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    found = find_project_root(Path(tmp_path / "unused-fallback"))
+    assert found.resolve() == tmp_path.resolve()
+
+
+def test_find_project_root_falls_back_when_no_markers(tmp_path, monkeypatch):
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    monkeypatch.chdir(empty)
+    fallback = tmp_path / "fallback"
+    assert find_project_root(fallback) == fallback
 
 
 def test_resolve_setup_path_with_directory(tmp_path: Path):

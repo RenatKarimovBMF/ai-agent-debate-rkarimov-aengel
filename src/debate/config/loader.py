@@ -16,12 +16,13 @@ from debate.config.models import (
     LlmConfig,
     LoggingConfig,
 )
+from debate.env_loader import find_project_root
 
 log = logging.getLogger("debate.config")
 
 
 def project_root() -> Path:
-    return Path(__file__).resolve().parents[3]
+    return find_project_root(Path(__file__).resolve().parents[3])
 
 
 def resolve_setup_path(root: Path, path: Path | None) -> Path:
