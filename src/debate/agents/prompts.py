@@ -69,9 +69,11 @@ def turn_prompt(
         )
     else:
         opponent_part = (
-            "This is the opening statement. Start by framing what "
-            "'greater' means under your value standard, then deliver "
-            "your single strongest argument."
+            "This is the opening statement. Start by framing the standard "
+            "for winning this debate (for a comparison, define what "
+            "'greater' or 'better' means; for a proposition, define the "
+            "key criterion that should decide it), then deliver your "
+            "single strongest argument."
         )
 
     return f"""

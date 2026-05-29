@@ -75,8 +75,12 @@ just decoration.
   spending its strongest argument on ping 1 when there are 10 pings).
 - **`This is the opening statement` branch** — opening turns have no
   opponent text to react to, so we explicitly tell the model to define
-  its value standard for "greater" first. Without this, the opening
-  turns were 60 % filler.
+  the standard for winning first. The instruction is motion-agnostic:
+  for a comparison it asks the model to define what "greater"/"better"
+  means; for a proposition it asks for the deciding criterion. This
+  keeps the engine generic for any `--topic`, not just the default
+  film comparison. Without this framing, the opening turns were 60 %
+  filler.
 - **Repeat the JSON schema** — Claude (and especially Gemini Flash)
   forget the JSON contract by ping 5 or 6 if you do not repeat it. Two
   lines of repetition saved us many retries.
