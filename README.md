@@ -1,7 +1,7 @@
 # AI Agent Debate
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-187%20passing-brightgreen.svg)](#tests)
+[![Tests](https://img.shields.io/badge/tests-193%20passing-brightgreen.svg)](#tests)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-brightgreen.svg)](https://docs.astral.sh/ruff/)
 [![Line cap](https://img.shields.io/badge/file%20size-%E2%89%A4%20150%20lines-brightgreen.svg)](scripts/check_line_cap.py)
@@ -29,11 +29,13 @@
 
 ## What you get
 
-| Agent | Movie | Job |
-|-------|-------|-----|
-| **Pro** | *The Godfather* (1972) | Argues Coppola's epic is the greater film |
-| **Con** | *The Shawshank Redemption* (1994) | Argues Darabont's prison drama wins |
-| **Parent / Judge** | — | Hosts the debate, relays messages, declares a winner |
+| Agent | Role | Job |
+|-------|------|-----|
+| **Pro** | Debater | Defends whichever side the Parent assigns at session start |
+| **Con** | Debater | Defends the opposing side |
+| **Parent / Judge** | Host | Assigns the sides, relays every message, declares a winner |
+
+The two sides come from config (default: *The Godfather* vs *The Shawshank Redemption*), but **the Parent decides which agent defends which side at runtime** — seeded by the session id, so it varies across runs and is never hardcoded.
 
 Agents never talk to each other directly — every turn goes through the **Parent**, like a moderated panel.
 
@@ -47,9 +49,17 @@ Pro  →  Parent  →  Con  →  Parent  →  Pro  →  …  (10 rounds by defau
 
 ## Quick start (about 5 minutes)
 
-### 1. Get a free Gemini API key
+### 1. Choose an LLM provider
 
-Create one at **[Google AI Studio](https://aistudio.google.com/apikey)** (no credit card in most regions).
+The debate needs one LLM. The app auto-selects in priority order `claude_cli → anthropic → gemini`, or you can force one with `LLM_PROVIDER`:
+
+| Provider | Cost | Setup | `LLM_PROVIDER` |
+|----------|------|-------|----------------|
+| **Claude CLI** (recommended) | Uses your Claude Pro/Max login — no per-call cost | `npm i -g @anthropic-ai/claude-code`, then run `claude` once to log in | `claude_cli` |
+| **Anthropic API** | Pay-as-you-go | Key from [console.anthropic.com](https://console.anthropic.com) → `ANTHROPIC_API_KEY` | `anthropic` |
+| **Google Gemini** | Free tier (Flash only, ~250 req/day) | Key from [AI Studio](https://aistudio.google.com/apikey) → `GEMINI_API_KEY` | `gemini` |
+
+We recommend **Claude** — a Pro/Max subscription gives high-quality, detailed turns at no per-call cost (the worked example in [examples/](examples/) used it; setup: [docs/CLAUDE_SETUP.md](docs/CLAUDE_SETUP.md)). The **Gemini free tier works and costs nothing, but it is noticeably less accurate and less detailed**, so it is not recommended for a representative run.
 
 ### 2. Clone and configure
 
@@ -59,14 +69,20 @@ cd ai-agent-debate-rkarimov-aengel
 copy .env.example .env
 ```
 
-Edit `.env`:
+Edit `.env` for your chosen provider — e.g. Gemini:
 
 ```env
 GEMINI_API_KEY=AIza...
 LLM_PROVIDER=gemini
 ```
 
-More detail: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
+…or Claude via the CLI (no API key, after `claude` login):
+
+```env
+LLM_PROVIDER=claude_cli
+```
+
+Gemini-specific detail: [docs/GEMINI_SETUP.md](docs/GEMINI_SETUP.md)
 
 ### 3. Install dependencies (UV)
 
@@ -95,38 +111,43 @@ uv run python -m debate.main --config config/demo_setup.json
 
 ---
 
-## Sample run (demo mode, Gemini)
+## Sample run
 
-We completed a **5-ping demo** with Google Search grounding. Session `18607637` — about **90 seconds** end-to-end.
+A complete, unedited **10-ping** session (`57cf02c2`) on the Claude provider — ~7m45s end-to-end, 21 LLM calls. The Parent assigned PRO to *Shawshank* and CON to *The Godfather* at runtime (the reverse of the config defaults), and **The Godfather (CON) won 84–76**.
 
 **Terminal excerpt:**
 
 ```
-SESSION: 18607637
+SESSION: 57cf02c2
 TOPIC: Which is the greater film: The Godfather (1972) or The Shawshank Redemption (1994)?
-PRO: The Godfather | CON: The Shawshank Redemption
-PINGS PER SIDE: 5
+OPTIONS ON THE TABLE: The Godfather | The Shawshank Redemption
+PINGS PER SIDE: 10
+PARENT (host): assigning sides — PRO defends 'The Shawshank Redemption',
+               CON defends 'The Godfather' (session-seeded, not hardcoded).
 
-PING 1/5 — PARENT asks PRO to argue
-PRO PROCESS: ping 1 LLM call started...
-PRO PROCESS: ping 1 answer ready
-PRO says: The Godfather stands as a cinematic titan … AFI #2, Academy Awards …
-PRO sources: https://www.imdb.com/… , https://…
+PING 1/10 — PARENT asks PRO to argue
+PRO says: Let me frame the standard. "Greater" film cannot mean merely
+          "most influential within one genre"… By that standard, The
+          Shawshank Redemption wins decisively…
+PRO sources: https://www.imdb.com/chart/top/
 
-PING 1/5 — PARENT asks CON to respond
-CON says: Shawshank holds #1 on IMDb Top 250 for decades — audience love matters …
+PING 1/10 — PARENT asks CON to respond
+CON says: My opponent's standard collapses on inspection… popularity is
+          not greatness… AFI ranks The Godfather at No. 2…
+CON sources: https://www.afi.com/afis-100-years-100-movies-10th-anniversary-edition/
 
-… (pings 2–5) …
+… (pings 2–10; the round turns on ping 8's refute-with-citation) …
 
 PARENT/JUDGE: Debate finished. Judge is choosing a winner…
-FINAL VERDICT: PRO wins
-PRO score: 88.0 | CON score: 84.0
-Verdict saved to: logs/verdict_18607637.json
+FINAL VERDICT: CON wins
+PRO score: 76.0
+CON score: 84.0
+Verdict saved to: logs/verdict_57cf02c2.json
 ```
 
-**Judge summary:** Pro framed “greatness” as artistic depth, critical consensus (AFI, Oscars, National Film Registry). Con emphasized IMDb popularity and emotional impact. **The Godfather** won on persuasion — not a tie.
+**Judge summary:** CON won the framing war by attacking the warrant behind PRO's IMDb ranking and stacking professional-consensus evidence (AFI #2, the 1972 Oscar sweep, the National Film Registry, Sight & Sound). The round turned on ping 8: PRO alleged a factual error and cited a non-existent AFI ranking; CON refuted it with a source in the same turn, so under the **refute-with-citation rule** the allegation rebounded against PRO. No tie — 84 to 76.
 
-Full JSON verdict: [assets/sample-verdict.json](assets/sample-verdict.json) (also saved locally as `logs/verdict_18607637.json` after a run).
+**The full session is documented in [examples/](examples/):** the [write-up](examples/README.md), the [turn-by-turn transcript](examples/transcript_57cf02c2.md), and the [verdict JSON](examples/verdict_57cf02c2.json). (`assets/sample-verdict.json` is a minimal schema sample.)
 
 ---
 
@@ -163,17 +184,21 @@ See [assets/screenshots/README.md](assets/screenshots/README.md).
 
 ## API usage & cost
 
-| Mode | LLM calls (typical) | Notes |
-|------|---------------------|-------|
+| Mode | LLM calls | Notes |
+|------|-----------|-------|
 | Demo (`demo_setup.json`) | ~11 | 5 Pro + 5 Con + 1 verdict (+ occasional JSON repair) |
 | Full (`setup.json`) | ~21 | 10 Pro + 10 Con + 1 verdict |
 
-**Token estimate (Gemini 2.5 Flash + search):** roughly **15k–25k tokens** for demo, **35k–55k** for full — depends on turn length and grounding.
+**Measured — full run, session `57cf02c2` (`claude_cli`):** exactly **21 LLM calls** (20 debate turns + 1 verdict), **0 JSON-repair retries**, **~7m45s** wall-clock — roughly **16–35s per turn** (one LLM call at a time, serialized through the Parent). See [examples/](examples/).
 
-**Cost:** free tier at [AI Studio](https://aistudio.google.com/) — **$0**, but subject to **rate limits** (HTTP 429). If quota is exhausted:
+**Token estimate (Gemini 2.5 Flash + search):** roughly **15k–25k tokens** for demo, **35k–55k** for full — depends on turn length and grounding. (The CLI providers don't report token counts; this is a Gemini-only estimate.)
 
-- Wait and retry, or use `config/demo_setup.json`
-- Course allows reducing 10 → 5 pings when budget is limited — **no grade penalty**
+**Cost & limits.** You can run the project on a paid subscription or for free; the provider is auto-selected (`claude_cli → anthropic → gemini`):
+
+- **Claude Pro/Max subscription (recommended).** A **Claude Pro** plan ($20/month) via `claude_cli` has **no per-call charge** — usage counts against Claude's rolling limits. In our full 10-ping run we used **under 10% of the 5-hour window** and **~1% of the weekly allowance**, so you can comfortably run many debates per month.
+- **Free tier (Gemini).** Free at [AI Studio](https://aistudio.google.com/) — **$0**, but with real caveats. The free tier serves **Flash models only** (`gemini-2.5-flash` and lighter fallbacks — the fast, low-cost Gemini, *not* the more capable Pro tier) and caps you at roughly **250 requests/day** with tight rate limits (HTTP 429). Because of the Flash model, a free run is **noticeably less accurate and less detailed** than Claude, and the daily cap can interrupt a full debate. We recommend it only when a subscription isn't an option.
+
+If you hit a limit: wait and retry, or use `config/demo_setup.json` (5 pings). The course allows reducing 10 → 5 pings — **no grade penalty**.
 
 Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interval_ms`, `max_total_requests`).
 
@@ -194,7 +219,7 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 | PRD / PLAN / TODO | [docs/](docs/) |
 | ADRs (per architectural decision) | [docs/adr/](docs/adr/) |
 | Prompt book (every LLM-facing prompt) | [docs/PROMPTS.md](docs/PROMPTS.md) |
-| Tests + 100% coverage on in-scope code | 187 tests · `uv run pytest --cov` |
+| Tests + 100% coverage on in-scope code | 193 tests · `uv run pytest --cov` |
 | Strict 150-line cap per `.py` file | `uv run python scripts/check_line_cap.py` |
 | CI (ruff + cap + tests on Python 3.11 / 3.12 / 3.13) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
 | Version tracking (code + config in lock-step) | `__version__` + `version` key validated at load |
@@ -205,12 +230,12 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 ```powershell
 uv run python scripts/check_line_cap.py    # every .py <= 150 raw lines
 uv run ruff check src tests scripts        # zero violations
-uv run pytest --cov                        # 187 tests, fail_under = 100%
+uv run pytest --cov                        # 193 tests, fail_under = 100%
 ```
 
 Or `make check` for all three in one go.
 
-**Docs:** [PRD](docs/PRD.md) · [PLAN](docs/PLAN.md) · [Architecture](docs/architecture.md) · [Gemini setup](docs/GEMINI_SETUP.md) · [Prompts](docs/PROMPTS.md) · [Known limitations](docs/KNOWN_LIMITATIONS.md) · [Changelog](CHANGELOG.md) · [ADRs](docs/adr/)
+**Docs:** [PRD](docs/PRD.md) · [PLAN](docs/PLAN.md) · [Architecture](docs/architecture.md) · [Claude setup](docs/CLAUDE_SETUP.md) · [Gemini setup](docs/GEMINI_SETUP.md) · [Prompts](docs/PROMPTS.md) · [Known limitations](docs/KNOWN_LIMITATIONS.md) · [Changelog](CHANGELOG.md) · [ADRs](docs/adr/)
 
 ---
 
@@ -221,11 +246,12 @@ ai-agent-debate-rkarimov-aengel/
 ├── config/                 setup.json, rate_limits.json (+ demo variants, version-stamped)
 ├── src/debate/             orchestrator, agents, gatekeeper, transport, GUI, watchdog
 ├── src/sdk/                Gemini / Anthropic / Claude-CLI LLM clients
-├── tests/unit/             185 targeted unit tests (each *_coverage.py < 150 lines)
+├── tests/unit/             191 targeted unit tests (each *_coverage.py < 150 lines)
 ├── tests/integration/      2 config-scaffold tests
 ├── scripts/                check_line_cap.py (150-line gate)
 ├── docs/                   PRD, PLAN, TODO, PROMPTS, KNOWN_LIMITATIONS, architecture
 ├── docs/adr/               10 architectural decision records + index
+├── examples/               worked 10-ping debate: write-up, transcript, verdict
 ├── .claude/skills/         project-local agent skills (debaters + parent/judge)
 ├── .github/                CI workflow + PR/issue templates
 ├── assets/posters/         README movie art

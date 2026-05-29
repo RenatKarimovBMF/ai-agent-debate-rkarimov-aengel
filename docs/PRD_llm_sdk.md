@@ -84,7 +84,7 @@ Controlled by environment variable `LLM_PROVIDER`:
 
 | Value | Behavior |
 |-------|----------|
-| `auto` (default) | First available: Gemini key → Anthropic key → Claude CLI |
+| `auto` (default) | First available: Claude CLI (installed + logged in) → Anthropic key → Gemini key |
 | `gemini` | Require valid `GEMINI_API_KEY`; error if missing |
 | `anthropic` | Require valid `ANTHROPIC_API_KEY` |
 | `claude_cli` | Force CLI subprocess path |

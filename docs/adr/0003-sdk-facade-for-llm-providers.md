@@ -12,8 +12,10 @@ between providers because students develop on free-tier Gemini.
 ## Decision
 
 `sdk.llm_client.LlmClient` is the single entry point for every LLM
-call. It chooses between Gemini → Anthropic API → Claude CLI in that
-order based on which credentials are available, and exposes a single
+call. It chooses between Claude CLI → Anthropic API → Gemini in that
+order (the Claude CLI subscription is preferred for fidelity; Gemini's
+free tier is the last-resort fallback), based on which credentials are
+available, and exposes a single
 `prompt(system, user)` method that returns a normalised
 `LlmResponse`. Agents never import `google.genai` or `anthropic`
 directly.

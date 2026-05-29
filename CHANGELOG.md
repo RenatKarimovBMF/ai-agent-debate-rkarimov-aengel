@@ -9,7 +9,11 @@ Per submission guideline §8.1, the major version is bumped on breaking
 restructures; minor versions bring backwards-compatible additions;
 patches are bug fixes.
 
-## [Unreleased]
+## [1.10] — 2026-05-30
+
+First iteration past the `1.00` submission baseline: Windows Claude CLI
+support, a Claude-first provider priority, a full worked example, and
+repo/CI hygiene.
 
 ### Added
 
@@ -24,8 +28,52 @@ patches are bug fixes.
   `src/`, `tests/`, **and** `scripts/`, so the 150-line rule cannot be
   silently broken by a new test file or helper script.
 
+### Fixed
+
+- **Project-root resolution when run as an installed package.**
+  `project_root()` (in both `config/loader.py` and `env_loader.py`) now
+  prefers the working directory — or an ancestor — that actually
+  contains `pyproject.toml` and `config/setup.json`, via a shared
+  `find_project_root` helper. Previously a file-relative path resolved
+  into `.venv/Lib` when `uv run python -m debate.main` executed the
+  installed copy, so verdicts were written to `.venv/Lib/logs/` instead
+  of the repo's `logs/`. Verdicts and config now resolve next to the
+  project as the README documents.
+- **Claude CLI provider on Windows.** `ClaudeAgentClient` now resolves
+  the CLI through `shutil.which` (so the npm `claude.cmd` / `claude.ps1`
+  shim is found, where the bare name failed under `CreateProcess`), and
+  invokes it with the system prompt via `--system-prompt-file` and the
+  user prompt via stdin. Passing multi-line prompts as CLI arguments
+  silently broke the Windows batch shim; a temp file path plus stdin is
+  safe on every platform. This makes the `claude_cli` provider work
+  end-to-end on Windows.
+
+### Added
+
+- **Worked example folder.** `examples/` holds a full, unedited 10-ping
+  session (`57cf02c2`): a write-up (`README.md`), the turn-by-turn
+  transcript (`transcript_57cf02c2.md`), and the machine-readable verdict
+  (`verdict_57cf02c2.json`). Linked from the README.
+
 ### Changed
 
+- **Provider auto-priority reordered to `claude_cli → anthropic → gemini`.**
+  When `LLM_PROVIDER=auto`, the SDK now prefers the Claude CLI (a
+  Claude Pro/Max subscription, detected via `ClaudeAgentClient.available()`)
+  for higher-fidelity turns, then the Anthropic API, then the free
+  Gemini tier as a fallback. Previously Gemini was tried first. Force a
+  specific provider with `LLM_PROVIDER=gemini|anthropic|claude_cli`.
+- **Runtime verdicts are no longer tracked.** `logs/verdict_*.json` is
+  now gitignored (alongside the existing `logs/*.log` and `*.jsonl`
+  rules) and the previously committed `logs/verdict_18607637.json` was
+  untracked. Curated example verdicts live in `assets/`
+  (`assets/sample-verdict.json`, `examples/verdict_57cf02c2.json`);
+  `logs/` holds only local runtime output plus its `.gitkeep`.
+- **Opening-statement framing is motion-agnostic.** `turn_prompt` no
+  longer assumes a "which is greater" comparison; it asks the debater to
+  define the standard for winning (comparison *or* proposition), so the
+  engine is generic for any `--topic`. `docs/PROMPTS.md` updated to
+  match.
 - **Quality-gate scope aligned across CI / Makefile / docs.** Ruff,
   the line-cap script, and `pytest --cov` now all walk
   `src/ tests/ scripts/` (Makefile `lint`/`format`, pre-commit, CI
@@ -34,7 +82,7 @@ patches are bug fixes.
   config-scaffold tests and never touch Gemini or Anthropic.
 - **Documentation counts refreshed.** README badge, `CONTRIBUTING.md`
   gate snippet, and PR-template checklist updated to the actual figures
-  (187 tests; `fail_under = 100`).
+  (193 tests; `fail_under = 100`).
 
 ## [1.00] — 2026-05-27
 

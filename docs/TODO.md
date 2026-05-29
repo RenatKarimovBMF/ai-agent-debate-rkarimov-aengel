@@ -202,7 +202,7 @@ Final pre-submission polish: align the project with Software Submission Guidelin
 | S14-06 | `docs/adr/` split into ten per-decision files (Michael Nygard template) | Alon | [x] |
 | S14-07 | `pyproject.toml` coverage scope + `fail_under = 100` | Renat | [x] |
 | S14-08 | Targeted `tests/unit/test_*_coverage.py` files (one per module) cover every remaining branch under the 150-line cap | Alon | [x] |
-| S14-09 | Coverage = 100% on in-scope code (185 unit tests) | Both | [x] |
+| S14-09 | Coverage = 100% on in-scope code (191 unit tests) | Both | [x] |
 
 ---
 
@@ -254,8 +254,8 @@ Re-audit under the strict (raw lines, including blanks/comments) reading of Guid
 
 ## Remaining work for submission
 
+- **End-to-end run:** [x] done — full 10-ping session `57cf02c2` on the `claude_cli` provider (The Godfather wins 84–76), documented in [`examples/`](../examples/) with transcript and verdict JSON.
 - **Screenshots:** capture terminal `--dry-run`, a live debate, GUI window, a verdict JSON file, and an excerpt of the rotating log. Place in `assets/screenshots/` and link from `README.md`.
-- **End-to-end run:** one full 10-ping run if Gemini quota permits, otherwise document the demo (5-ping) run.
 - **Moodle PDF:** each partner submits the same GitHub URL via Moodle (manual step).
 
 ## Optional extras (not required, may add submission polish)

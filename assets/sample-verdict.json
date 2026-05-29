@@ -2,12 +2,12 @@
   "version": "1.0",
   "type": "verdict",
   "from_role": "parent",
-  "session_id": "18607637",
+  "session_id": "example",
   "payload": {
     "winner": "pro",
-    "pro_score": 88.0,
-    "con_score": 84.0,
-    "rationale": "PRO consistently argued that cinematic greatness is defined by artistic depth, groundbreaking direction, critical consensus, and enduring influence on the art form itself. PRO effectively cited multiple Academy Awards, high rankings on the American Film Institute's lists (Godfather at #2 vs. Shawshank at #72), and inclusion in the National Film Registry, underscoring The Godfather's recognized historical and aesthetic significance. PRO successfully positioned these markers of greatness as distinct from, and ultimately more weighty than, CON's emphasis on popular appeal.\n\nCON's arguments focused strongly on The Shawshank Redemption's universal emotional resonance, uplifting message, and unparalleled connection with audiences, as evidenced by its consistent #1 ranking on IMDb's user-voted Top 250 list. CON skillfully framed this audience adoration as a 'democratic measure of enduring appreciation' and a 'profound and lasting human impact.' However, PRO's sustained counter-argument that 'true cinematic greatness often lies in profound artistic depth, not solely in feel-good storytelling' and that The Godfather's 'artistic and cultural footprint is demonstrably wider and deeper, influencing filmmaking language itself' was ultimately more persuasive in defining 'greater film' in a critical and academic context.\n\nBoth sides demonstrated excellent direct rebuttal quality, clarity, and respectful tone. Source use was strong and appropriate from both debaters. PRO's overall persuasive strategy, by consistently elevating the criteria for 'greatness' beyond mere popularity to encompass artistic innovation, critical acclaim, and foundational influence on cinema, earned it the win.",
-    "persuasion_notes": "PRO's consistent framing of 'greatness' in terms of artistic innovation, critical consensus, and influence on the art form was highly effective. By repeatedly contrasting this with 'audience favorability' or 'feel-good storytelling,' PRO managed to control the definition of the debate's core term. CON made a valiant effort to redefine greatness through emotional resonance and popular impact, but PRO's evidence of institutional recognition (AFI, Oscars, National Film Registry) provided a stronger foundation for its claims. The specificity of PRO's citations regarding AFI rankings, in particular, provided a tangible point of comparison that favored its argument."
+    "pro_score": 82.0,
+    "con_score": 75.0,
+    "rationale": "Illustrative schema sample only (not a real run). The Parent/Judge writes one object in this shape after every debate: winner is exactly \"pro\" or \"con\", the two scores are distinct (no ties), and the higher score belongs to the winner. For a real, fully documented verdict see examples/verdict_57cf02c2.json.",
+    "persuasion_notes": "Illustrative placeholder. In a real verdict this references at least one of the five judging principles (persuasion-not-truth, clash, refute-with-citation, dropped-arguments, no-tie tie-break) and explains why the winning side was more persuasive."
   }
 }
