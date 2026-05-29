@@ -43,9 +43,10 @@ class LlmResponse:
 class LlmClient:
     """
     Unified LLM access. Priority when LLM_PROVIDER=auto:
-      1. Gemini (GEMINI_API_KEY) — free tier friendly
+      1. Claude CLI login (highest quality; uses a Claude Pro/Max plan)
       2. Anthropic API (ANTHROPIC_API_KEY)
-      3. Claude CLI login
+      3. Gemini (GEMINI_API_KEY) — free tier, lower fidelity
+    Set LLM_PROVIDER explicitly (gemini / anthropic / claude_cli) to override.
     """
 
     def __init__(
@@ -81,11 +82,14 @@ class LlmClient:
             return "anthropic"
         if forced == "claude_cli":
             return "claude_cli"
-        # auto: prefer free Gemini, then Anthropic, then CLI
-        if _env_key("GEMINI_API_KEY"):
-            return "gemini"
+        # auto: prefer the Claude CLI subscription, then the Anthropic
+        # API, then the free (but lower-fidelity) Gemini tier.
+        if self._claude.available():
+            return "claude_cli"
         if _env_key("ANTHROPIC_API_KEY"):
             return "anthropic"
+        if _env_key("GEMINI_API_KEY"):
+            return "gemini"
         return "claude_cli"
 
     def _gemini_client(self) -> GeminiAgentClient:

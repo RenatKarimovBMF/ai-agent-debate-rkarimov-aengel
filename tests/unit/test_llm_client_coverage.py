@@ -50,19 +50,39 @@ def test_llm_client_forces_claude_cli(monkeypatch):
     assert client._resolve_provider() == "claude_cli"
 
 
-def test_llm_client_auto_prefers_anthropic_when_no_gemini(monkeypatch):
+def test_llm_client_auto_prefers_claude_cli_when_available(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "auto")
+    monkeypatch.setenv("GEMINI_API_KEY", "AIzaSy1234567890abcdef")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-real")
+    client = LlmClient()
+    monkeypatch.setattr(client._claude, "available", lambda: True)
+    assert client._resolve_provider() == "claude_cli"
+
+
+def test_llm_client_auto_uses_anthropic_when_cli_absent(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "auto")
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-real")
     client = LlmClient()
+    monkeypatch.setattr(client._claude, "available", lambda: False)
     assert client._resolve_provider() == "anthropic"
 
 
-def test_llm_client_auto_falls_through_to_claude_cli(monkeypatch):
+def test_llm_client_auto_uses_gemini_when_only_gemini_key(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "auto")
+    monkeypatch.setenv("GEMINI_API_KEY", "AIzaSy1234567890abcdef")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    client = LlmClient()
+    monkeypatch.setattr(client._claude, "available", lambda: False)
+    assert client._resolve_provider() == "gemini"
+
+
+def test_llm_client_auto_last_resort_claude_cli(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "auto")
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     client = LlmClient()
+    monkeypatch.setattr(client._claude, "available", lambda: False)
     assert client._resolve_provider() == "claude_cli"
 
 
