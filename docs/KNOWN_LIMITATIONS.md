@@ -130,3 +130,21 @@ architecture the assignment asks for.
 - **Workaround:** the skill files are short and could be inlined into
   the Python prompts if you need full parity with Gemini. We kept
   them in Markdown because they are easier to iterate on as text.
+
+## L-10: Free-tier Gemini produces lower-fidelity debates
+
+- **Description:** the auto provider priority is
+  `claude_cli → anthropic → gemini`, and the free Gemini tier (used
+  when only a `GEMINI_API_KEY` is present) serves **Flash models only**
+  (`gemini-2.5-flash` and the lighter fallbacks in `config/setup.json`,
+  not the more capable Pro tier) with a cap of roughly **250 requests
+  per day** and tight rate limits.
+- **Impact:** debates run for free are **noticeably less accurate and
+  less detailed** than on Claude (the recommended provider), and the
+  daily request cap can interrupt a full 10-ping run (~21 calls). The
+  worked example in `examples/` was produced on `claude_cli` for this
+  reason.
+- **Workaround:** use a Claude Pro/Max subscription via the CLI
+  (`docs/CLAUDE_SETUP.md`) or a paid Anthropic / Gemini API tier for a
+  representative run; the free tier is supported as a no-cost fallback,
+  not as the quality baseline.
