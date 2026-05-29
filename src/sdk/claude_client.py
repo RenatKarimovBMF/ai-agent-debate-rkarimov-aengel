@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -24,22 +26,41 @@ class ClaudeAgentClient:
         workdir: Path | None = None,
         timeout_seconds: int = 120,
     ) -> None:
-        self._cli = os.environ.get("CLAUDE_CLI_PATH", cli_command)
+        configured = os.environ.get("CLAUDE_CLI_PATH", cli_command)
+        # On Windows the CLI is a `claude.cmd` / `claude.ps1` shim that
+        # CreateProcess cannot find from the bare name, so resolve the
+        # real path via PATHEXT. Falls back to the configured name when
+        # the CLI is absent (CI), preserving the missing-CLI error path.
+        self._cli = shutil.which(configured) or configured
         self._workdir = workdir or Path.cwd()
         self._timeout = timeout_seconds
 
+    def available(self) -> bool:
+        """True if the Claude CLI is installed and resolvable on PATH."""
+        return shutil.which(self._cli) is not None
+
     def prompt(self, system: str, user: str) -> ClaudeResponse:
-        """Run a single non-interactive CLI invocation."""
+        """Run a single non-interactive CLI invocation.
+
+        The system prompt is written to a temp file (`--system-prompt-file`)
+        and the user prompt is piped via stdin. Multi-line text passed as a
+        CLI argument breaks the Windows `claude.cmd` shim, whereas a file
+        path and stdin are safe on every platform.
+        """
+        sys_file = tempfile.NamedTemporaryFile(
+            "w", suffix=".txt", delete=False, encoding="utf-8"
+        )
+        sys_file.write(system)
+        sys_file.close()
         cmd = [
             self._cli,
-            "-p",
-            user,
-            "--system-prompt",
-            system,
+            "--print",
+            "--system-prompt-file",
+            sys_file.name,
             "--output-format",
             "text",
         ]
-        logger.info("SDK prompt", extra={"extra_data": {"cmd": cmd[:3]}})
+        logger.info("SDK prompt", extra={"extra_data": {"cmd": cmd[:2]}})
         try:
             result = subprocess.run(
                 cmd,
@@ -48,9 +69,12 @@ class ClaudeAgentClient:
                 text=True,
                 timeout=self._timeout,
                 check=False,
+                input=user,
             )
         except subprocess.TimeoutExpired as exc:
             raise TimeoutError(f"Claude CLI timed out after {self._timeout}s") from exc
+        finally:
+            os.unlink(sys_file.name)
         if result.returncode != 0:
             raise RuntimeError(result.stderr or result.stdout or "Claude CLI failed")
         text = result.stdout.strip()

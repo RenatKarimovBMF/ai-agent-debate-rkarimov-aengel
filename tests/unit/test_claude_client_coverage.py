@@ -15,6 +15,18 @@ from sdk.claude_client import ClaudeAgentClient
 from ._coverage_helpers import MagicMock
 
 
+def test_claude_available_false_for_missing_cli(monkeypatch):
+    monkeypatch.setattr("sdk.claude_client.shutil.which", lambda c: None)
+    client = ClaudeAgentClient(cli_command="definitely-not-a-real-cli")
+    assert client.available() is False
+
+
+def test_claude_available_true_when_resolvable(monkeypatch):
+    monkeypatch.setattr("sdk.claude_client.shutil.which", lambda c: "C:/claude.CMD")
+    client = ClaudeAgentClient()
+    assert client.available() is True
+
+
 def test_claude_prompt_cli_timeout(monkeypatch):
     monkeypatch.setattr(
         "sdk.claude_client.subprocess.run",
