@@ -75,6 +75,10 @@ class ParentAgent(BaseAgent):
             f"{message.payload.text}\nSources: {citations}"
         )
 
+    def transcript_text(self) -> str:
+        """Full debate transcript (every turn, untruncated) for persistence."""
+        return "\n\n".join(self._history)
+
     def render_verdict(self) -> VerdictMessage:
         transcript = "\n\n".join(self._history[-80:])
         pro_side, con_side = self._assigned_sides()

@@ -67,6 +67,8 @@ class ClaudeAgentClient:
                 cwd=self._workdir,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=self._timeout,
                 check=False,
                 input=user,

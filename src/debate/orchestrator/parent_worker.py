@@ -11,6 +11,7 @@ from debate.orchestrator.events import emit_event
 from debate.orchestrator.factory import create_parent_agent
 from debate.orchestrator.host_protocol import send_assignments
 from debate.orchestrator.ping_round import run_ping_round
+from debate.orchestrator.transcript_io import write_transcript
 from debate.orchestrator.verdict_io import save_verdict
 
 
@@ -85,6 +86,8 @@ def parent_worker(
 
         emit_event(event_queue, "")
         emit_event(event_queue, "PARENT/JUDGE: Debate finished. Judge is choosing a winner...")
+        transcript_path = write_transcript(config, session_id, parent.transcript_text())
+        emit_event(event_queue, f"Full transcript saved to: {transcript_path}")
         save_verdict(config, session_id, parent.render_verdict(), event_queue)
 
     except Exception as exc:

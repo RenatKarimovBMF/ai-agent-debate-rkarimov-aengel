@@ -36,6 +36,12 @@ repo/CI hygiene.
 
 ### Added
 
+- **Full transcript persistence.** At the end of a debate the Parent
+  writes the complete, untruncated transcript (every turn + sources) to
+  `logs/transcript_<session>.md` (gitignored, like the verdict). The
+  console previously abbreviated long turns; the Parent's in-memory
+  history and the verdict prompt always saw the full text, but it was
+  not persisted in full until now.
 - **Type-check gate (mypy).** `uv run mypy src` runs clean on the core
   and is wired into CI, the Makefile (`make typecheck` / `make check`),
   CONTRIBUTING, and the PR template. The Tk GUI is scoped out
@@ -61,6 +67,12 @@ repo/CI hygiene.
 
 ### Fixed
 
+- **Claude CLI output encoding on Windows.** `ClaudeAgentClient` now runs
+  the CLI subprocess with `encoding="utf-8"` (and `errors="replace"`),
+  so the model's UTF-8 output (em-dashes, quotes, etc.) is decoded
+  correctly instead of being mangled by the Windows locale codepage
+  (cp1252). Previously those characters were corrupted in the transcript
+  and in the text the judge scored.
 - **Project-root resolution when run as an installed package.**
   `project_root()` (in both `config/loader.py` and `env_loader.py`) now
   prefers the working directory — or an ancestor — that actually
@@ -81,13 +93,19 @@ repo/CI hygiene.
 
 ### Added
 
-- **Worked example folder.** `examples/` holds a full, unedited 10-ping
-  session (`57cf02c2`): a write-up (`README.md`), the turn-by-turn
-  transcript (`transcript_57cf02c2.md`), and the machine-readable verdict
-  (`verdict_57cf02c2.json`). Linked from the README.
+- **Worked example folders.** `examples/` holds two full, unedited 10-ping
+  sessions, each with a write-up (`README.md`), transcript (`transcript.md`),
+  and verdict (`verdict.json`): `godfather-vs-shawshank/` (the default
+  topic, `57cf02c2`, The Godfather wins 84–76) and `abortion-legality/`
+  (a custom `--topic` run, `c1255aa1`, PRO wins 84–80) which demonstrates
+  the engine is topic-agnostic. An index `examples/README.md` lists both.
 
 ### Changed
 
+- **Console no longer truncates debate turns.** The live `PRO says:` /
+  `CON says:` lines now print each turn in full instead of cutting at
+  ~700 characters mid-sentence. (The judge and the opponent always
+  received the full text; only the on-screen log was abbreviated.)
 - **Debater skills are now fully generic (no hardcoded topic lore).**
   Removed the two film-specific lore skills (`debate-pro-godfather`,
   `debate-con-shawshank`) and replaced them with one side-agnostic,
@@ -105,7 +123,7 @@ repo/CI hygiene.
   now gitignored (alongside the existing `logs/*.log` and `*.jsonl`
   rules) and the previously committed `logs/verdict_18607637.json` was
   untracked. Curated example verdicts live in `assets/`
-  (`assets/sample-verdict.json`, `examples/verdict_57cf02c2.json`);
+  (`assets/sample-verdict.json`, `examples/*/verdict.json`);
   `logs/` holds only local runtime output plus its `.gitkeep`.
 - **Opening-statement framing is motion-agnostic.** `turn_prompt` no
   longer assumes a "which is greater" comparison; it asks the debater to

@@ -185,7 +185,7 @@ Verdict saved to: logs/verdict_57cf02c2.json
 
 **Judge summary:** CON won the framing war by attacking the warrant behind PRO's IMDb ranking and stacking professional-consensus evidence (AFI #2, the 1972 Oscar sweep, the National Film Registry, Sight & Sound). The round turned on ping 8: PRO alleged a factual error and cited a non-existent AFI ranking; CON refuted it with a source in the same turn, so under the **refute-with-citation rule** the allegation rebounded against PRO. No tie — 84 to 76.
 
-**The full session is documented in [examples/](examples/):** the [write-up](examples/README.md), the [turn-by-turn transcript](examples/transcript_57cf02c2.md), and the [verdict JSON](examples/verdict_57cf02c2.json). (`assets/sample-verdict.json` is a minimal schema sample.)
+**The full session is documented in [examples/godfather-vs-shawshank/](examples/godfather-vs-shawshank/):** the [write-up](examples/godfather-vs-shawshank/README.md), the [turn-by-turn transcript](examples/godfather-vs-shawshank/transcript.md), and the [verdict JSON](examples/godfather-vs-shawshank/verdict.json). A second worked example on a **custom topic** (abortion legality, via `--topic`) lives in [examples/abortion-legality/](examples/abortion-legality/) — see [examples/](examples/) for the index. (`assets/sample-verdict.json` is a minimal schema sample.)
 
 ---
 
@@ -291,7 +291,7 @@ ai-agent-debate-rkarimov-aengel/
 ├── scripts/                check_line_cap.py (150-line gate)
 ├── docs/                   PRD, PLAN, TODO, PROMPTS, KNOWN_LIMITATIONS, architecture
 ├── docs/adr/               10 architectural decision records + index
-├── examples/               worked 10-ping debate: write-up, transcript, verdict
+├── examples/               two worked 10-ping debates (default + custom topic): write-up, transcript, verdict
 ├── .claude/skills/         project-local agent skills (debaters + parent/judge)
 ├── .github/                CI workflow + PR/issue templates
 ├── assets/posters/         README movie art

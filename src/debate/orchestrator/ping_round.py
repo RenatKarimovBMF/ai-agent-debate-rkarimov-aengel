@@ -7,7 +7,7 @@ from debate.agents import ParentAgent
 from debate.config import AppConfig
 from debate.models import AgentRole
 from debate.orchestrator.commands import relay_message, turn_request
-from debate.orchestrator.events import emit_event, queue_get_or_timeout, short_text
+from debate.orchestrator.events import emit_event, queue_get_or_timeout
 from debate.orchestrator.messages import make_relay, validate_child_message
 
 
@@ -44,7 +44,7 @@ def run_ping_round(
     parent.record_turn(pro_msg)
     last_pro = pro_msg.payload.text
 
-    emit_event(event_queue, f"PRO says: {short_text(last_pro)}")
+    emit_event(event_queue, f"PRO says: {last_pro}")
     if pro_msg.payload.citations:
         emit_event(
             event_queue,
@@ -69,7 +69,7 @@ def run_ping_round(
     parent.record_turn(con_msg)
     last_con = con_msg.payload.text
 
-    emit_event(event_queue, f"CON says: {short_text(last_con)}")
+    emit_event(event_queue, f"CON says: {last_con}")
     if con_msg.payload.citations:
         emit_event(
             event_queue,

@@ -12,6 +12,7 @@ coverage.xml
 logs/*.log
 logs/*.jsonl
 logs/verdict_*.json
+logs/transcript_*.md
 fifo/*
 !fifo/.gitkeep
 !logs/.gitkeep

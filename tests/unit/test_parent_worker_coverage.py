@@ -20,6 +20,9 @@ class _FakeParent:
     def apply_assignment(self, *, pro_side: str, con_side: str) -> None:
         self.sides = (pro_side, con_side)
 
+    def transcript_text(self) -> str:
+        return "full transcript"
+
     def render_verdict(self) -> str:
         return "verdict"
 
@@ -45,6 +48,7 @@ def patched(monkeypatch):
         return ("pro", "con")
 
     monkeypatch.setattr(pw, "run_ping_round", fake_round)
+    monkeypatch.setattr(pw, "write_transcript", lambda cfg, sid, text: None)
     monkeypatch.setattr(
         pw,
         "save_verdict",
