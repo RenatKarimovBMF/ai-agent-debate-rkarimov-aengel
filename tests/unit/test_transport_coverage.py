@@ -56,25 +56,24 @@ def test_file_queue_transport_returns_none_when_timeout_is_none(tmp_path):
     assert transport.read(timeout=None) is None
 
 
-def test_file_queue_transport_waits_for_message(tmp_path):
-    """Exercises the sleep branch in `FileQueueTransport.read`."""
+def test_file_queue_transport_waits_for_message(tmp_path, monkeypatch):
+    """Exercises the sleep branch in `FileQueueTransport.read`.
+
+    No writer thread: the message is delivered from a patched ``time.sleep``
+    so the wait/sleep branch runs without a real background thread (which
+    crashes coverage's tracer during GC on CI — SIGILL).
+    """
+    import debate.transport.file_queue as fq
+
     path = tmp_path / "slow.queue"
-    transport = FileQueueTransport(path)
+    transport = fq.FileQueueTransport(path)
     msg = make_message()
 
-    import threading
-    import time as _time
+    def fake_sleep(_seconds: float) -> None:
+        transport.write(msg)  # message "arrives" during the wait
 
-    def writer():
-        _time.sleep(0.25)
-        transport.write(msg)
-
-    t = threading.Thread(target=writer)
-    t.start()
-    try:
-        result = transport.read(timeout=2.0)
-    finally:
-        t.join()
+    monkeypatch.setattr(fq.time, "sleep", fake_sleep)
+    result = transport.read(timeout=2.0)
 
     assert result is not None
     assert result.payload.text == "hi"
