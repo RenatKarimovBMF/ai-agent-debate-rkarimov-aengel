@@ -18,18 +18,20 @@ class FifoTransport(MessageTransport):
         self._path = path
         self._path.parent.mkdir(parents=True, exist_ok=True)
         if not self._path.exists():
-            os.mkfifo(self._path)
+            os.mkfifo(self._path)  # type: ignore[attr-defined]  # POSIX-only
 
         self._read_fd: int | None = None
         self._write_fd: int | None = None
 
     def _ensure_write(self) -> None:
         if self._write_fd is None:
-            self._write_fd = os.open(self._path, os.O_WRONLY | os.O_NONBLOCK)
+            flags = os.O_WRONLY | os.O_NONBLOCK  # type: ignore[attr-defined]  # POSIX-only
+            self._write_fd = os.open(self._path, flags)
 
     def _ensure_read(self) -> None:
         if self._read_fd is None:
-            self._read_fd = os.open(self._path, os.O_RDONLY | os.O_NONBLOCK)
+            flags = os.O_RDONLY | os.O_NONBLOCK  # type: ignore[attr-defined]  # POSIX-only
+            self._read_fd = os.open(self._path, flags)
 
     def write(self, message: DebateMessage) -> None:
         self._ensure_write()

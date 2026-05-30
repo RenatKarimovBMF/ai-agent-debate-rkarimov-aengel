@@ -34,6 +34,19 @@ repo/CI hygiene.
   `src/`, `tests/`, **and** `scripts/`, so the 150-line rule cannot be
   silently broken by a new test file or helper script.
 
+### Added
+
+- **Type-check gate (mypy).** `uv run mypy src` runs clean on the core
+  and is wired into CI, the Makefile (`make typecheck` / `make check`),
+  CONTRIBUTING, and the PR template. The Tk GUI is scoped out
+  (`[[tool.mypy.overrides]]`) since Tk stubs are noisy and low-value;
+  the optional, platform-specific `os.mkfifo` and `mp.Process` lines
+  carry targeted `# type: ignore` comments.
+- **CI runs headless GUI tests under Xvfb.** The workflow installs
+  `xvfb` and runs `pytest` via `xvfb-run -a`, so the real-Tk GUI tests
+  (which need a display) pass on the headless `ubuntu-latest` runner
+  while coverage stays at a genuine 100%.
+
 ### Changed
 
 - **Coverage is now genuinely 100% — the `omit` list is empty.** Every

@@ -23,11 +23,13 @@ Run before opening the PR:
 
 ```bash
 uv run ruff check src tests scripts
+uv run mypy src
 uv run pytest --cov
 uv run python scripts/check_line_cap.py
 ```
 
 - [ ] `ruff check` is clean.
+- [ ] `mypy src` is clean.
 - [ ] `pytest --cov` exits 0; coverage stays at 100% (omit list empty).
 - [ ] Every `.py` file under `src/`, `tests/`, `scripts/` is at most
       150 raw lines (PRD NFR-01).

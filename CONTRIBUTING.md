@@ -52,6 +52,7 @@ Copy `.env.example` to `.env` and fill in at least one of
 
 ```
 uv run ruff check src tests scripts  # zero violations
+uv run mypy src                      # type-check the core (GUI scoped out)
 uv run pytest --cov                  # 266 tests, fail_under = 100% (omit list empty)
 uv run python -m debate.main --dry-run --config config/setup.json
                                      # the CLI must still load

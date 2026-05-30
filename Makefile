@@ -6,7 +6,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install install-dev clean \
-        test test-cov lint format cap check ci \
+        test test-cov lint format typecheck cap check ci \
         run dry-run gui version
 
 help: ## show this help
@@ -19,8 +19,9 @@ help: ## show this help
 	@echo "  test-cov       run the pytest suite with coverage report"
 	@echo "  lint           run ruff in check mode"
 	@echo "  format         run ruff in fix-and-format mode"
+	@echo "  typecheck      run mypy on src"
 	@echo "  cap            verify every .py file in src/tests/scripts is <= 150 raw lines"
-	@echo "  check          run lint + cap + test-cov (the full local gate)"
+	@echo "  check          run lint + typecheck + cap + test-cov (the full local gate)"
 	@echo "  ci             alias for check, intended for CI"
 	@echo ""
 	@echo "  run            python -m debate.main (full debate)"
@@ -49,10 +50,13 @@ format: ## ruff fix + format
 	uv run ruff check --fix src tests scripts
 	uv run ruff format src tests scripts
 
+typecheck: ## run mypy on src
+	uv run mypy src
+
 cap: ## verify the 150-line raw-line file cap
 	uv run python scripts/check_line_cap.py 150
 
-check: lint cap test-cov ## run the full local quality gate
+check: lint typecheck cap test-cov ## run the full local quality gate
 ci: check ## same as check; called from CI
 
 run: ## run a full debate session

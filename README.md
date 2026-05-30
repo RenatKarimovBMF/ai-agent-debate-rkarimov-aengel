@@ -4,6 +4,7 @@
 [![Tests](https://img.shields.io/badge/tests-266%20passing-brightgreen.svg)](#tests)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-brightgreen.svg)](https://docs.astral.sh/ruff/)
+[![Mypy](https://img.shields.io/badge/typecheck-mypy%20clean-brightgreen.svg)](https://mypy-lang.org/)
 [![Line cap](https://img.shields.io/badge/file%20size-%E2%89%A4%20150%20lines-brightgreen.svg)](scripts/check_line_cap.py)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -221,7 +222,8 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 | Prompt book (every LLM-facing prompt) | [docs/PROMPTS.md](docs/PROMPTS.md) |
 | Tests + 100% coverage (every runtime module; omit list empty) | 266 tests · `uv run pytest --cov` |
 | Strict 150-line cap per `.py` file | `uv run python scripts/check_line_cap.py` |
-| CI (ruff + cap + tests on Python 3.11 / 3.12 / 3.13) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
+| CI (ruff + mypy + cap + tests on Python 3.11 / 3.12 / 3.13) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
+| Type checking (mypy) | `uv run mypy src` (core; Tk GUI scoped out) |
 | Version tracking (code + config in lock-step) | `__version__` + `version` key validated at load |
 | UV + `uv.lock`, JSON config | `config/setup.json` |
 
@@ -230,6 +232,7 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 ```powershell
 uv run python scripts/check_line_cap.py    # every .py <= 150 raw lines
 uv run ruff check src tests scripts        # zero violations
+uv run mypy src                            # type-check (GUI scoped out)
 uv run pytest --cov                        # 266 tests, fail_under = 100%
 ```
 

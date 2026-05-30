@@ -24,6 +24,7 @@ dev = [
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=6.0.0",
     "ruff>=0.8.0",
+    "mypy>=1.13.0",
 ]
 
 [project.scripts]
@@ -62,6 +63,19 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
 ]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src"]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_redundant_casts = true
+
+# The Tk GUI is optional and Tk's stubs are noisy/low-value to satisfy;
+# type-check the core logic and scope the GUI package out of errors.
+[[tool.mypy.overrides]]
+module = "debate.gui.*"
+ignore_errors = true
 
 [tool.ruff]
 line-length = 100

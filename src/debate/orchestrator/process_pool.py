@@ -27,7 +27,7 @@ class DebateProcessPool:
     def start_all(self, on_started: Callable[[str, int], None]) -> None:
         self.processes["pro"] = self._spawn_child("pro", AgentRole.PRO.value)
         self.processes["con"] = self._spawn_child("con", AgentRole.CON.value)
-        self.processes["parent"] = self._ctx.Process(
+        self.processes["parent"] = self._ctx.Process(  # type: ignore[attr-defined]
             name=f"debate-parent-{self._session_id}",
             target=parent_worker,
             args=(
@@ -52,7 +52,7 @@ class DebateProcessPool:
         else:
             inbound, outbound = self.parent_to_con, self.con_to_parent
 
-        return self._ctx.Process(
+        return self._ctx.Process(  # type: ignore[attr-defined]
             name=f"debate-{label}-{self._session_id}",
             target=child_worker,
             args=(
