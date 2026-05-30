@@ -96,7 +96,7 @@ repo/CI hygiene.
 - **Worked example folders.** `examples/` holds two full, unedited 10-ping
   sessions, each with a write-up (`README.md`), transcript (`transcript.md`),
   and verdict (`verdict.json`): `godfather-vs-shawshank/` (the default
-  topic, `57cf02c2`, The Godfather wins 84–76) and `abortion-legality/`
+  topic, `fe14afde`, The Godfather wins 83–78) and `abortion-legality/`
   (a custom `--topic` run, `c1255aa1`, PRO wins 84–80) which demonstrates
   the engine is topic-agnostic. An index `examples/README.md` lists both.
 

@@ -151,12 +151,12 @@ uv run python -m debate.main --config config/demo_setup.json
 
 ## Sample run
 
-A complete, unedited **10-ping** session (`57cf02c2`) on the Claude provider — ~7m45s end-to-end, 21 LLM calls. The Parent assigned PRO to *Shawshank* and CON to *The Godfather* at runtime (the reverse of the config defaults), and **The Godfather (CON) won 84–76**.
+A complete, unedited **10-ping** session (`fe14afde`) on the Claude provider — ~7m57s end-to-end, 21 LLM calls. The Parent assigned PRO to *Shawshank* and CON to *The Godfather* at runtime, and **The Godfather (CON) won 83–78**.
 
 **Terminal excerpt:**
 
 ```
-SESSION: 57cf02c2
+SESSION: fe14afde
 TOPIC: Which is the greater film: The Godfather (1972) or The Shawshank Redemption (1994)?
 OPTIONS ON THE TABLE: The Godfather | The Shawshank Redemption
 PINGS PER SIDE: 10
@@ -164,26 +164,27 @@ PARENT (host): assigning sides — PRO defends 'The Shawshank Redemption',
                CON defends 'The Godfather' (session-seeded, not hardcoded).
 
 PING 1/10 — PARENT asks PRO to argue
-PRO says: Let me frame the standard. "Greater" film cannot mean merely
-          "most influential within one genre"… By that standard, The
-          Shawshank Redemption wins decisively…
+PRO says: Let's set the standard. 'Greater' film should mean the work that
+          most successfully achieves its artistic aim and reaches the widest
+          audience… Shawshank has remained the No. 1 film on IMDb's Top 250…
 PRO sources: https://www.imdb.com/chart/top/
 
 PING 1/10 — PARENT asks CON to respond
-CON says: My opponent's standard collapses on inspection… popularity is
-          not greatness… AFI ranks The Godfather at No. 2…
-CON sources: https://www.afi.com/afis-100-years-100-movies-10th-anniversary-edition/
+CON says: IMDb's Top 250 measures popularity among self-selecting voters,
+          not artistic greatness… AFI ranked The Godfather the No. 2
+          American film ever made; Shawshank does not appear…
+CON sources: https://www.afi.com/afis-100-years-100-movies-10th-anniversary-edition/, https://www.oscars.org/oscars/ceremonies/1973
 
-… (pings 2–10; the round turns on ping 8's refute-with-citation) …
+… (pings 2–10; the round turns on ping 2's refute-with-citation) …
 
 PARENT/JUDGE: Debate finished. Judge is choosing a winner…
 FINAL VERDICT: CON wins
-PRO score: 76.0
-CON score: 84.0
-Verdict saved to: logs/verdict_57cf02c2.json
+PRO score: 78.0
+CON score: 83.0
+Verdict saved to: logs/verdict_fe14afde.json
 ```
 
-**Judge summary:** CON won the framing war by attacking the warrant behind PRO's IMDb ranking and stacking professional-consensus evidence (AFI #2, the 1972 Oscar sweep, the National Film Registry, Sight & Sound). The round turned on ping 8: PRO alleged a factual error and cited a non-existent AFI ranking; CON refuted it with a source in the same turn, so under the **refute-with-citation rule** the allegation rebounded against PRO. No tie — 84 to 76.
+**Judge summary:** CON ran the tighter, better-diversified case — attacking PRO's single load-bearing warrant (IMDb's #1 user ranking) while stacking convergent professional-consensus evidence (AFI #2, two Best Picture wins, Sight & Sound, genre-redefining influence). The round turned on ping 2: PRO claimed Shawshank ranks AFI #72 (a falsehood); CON refuted it with a cited AFI source and PRO conceded, so under the **refute-with-citation rule** the over-reach cost PRO. No tie — 83 to 78.
 
 **The full session is documented in [examples/godfather-vs-shawshank/](examples/godfather-vs-shawshank/):** the [write-up](examples/godfather-vs-shawshank/README.md), the [turn-by-turn transcript](examples/godfather-vs-shawshank/transcript.md), and the [verdict JSON](examples/godfather-vs-shawshank/verdict.json). A second worked example on a **custom topic** (abortion legality, via `--topic`) lives in [examples/abortion-legality/](examples/abortion-legality/) — see [examples/](examples/) for the index. (`assets/sample-verdict.json` is a minimal schema sample.)
 
@@ -227,7 +228,7 @@ See [assets/screenshots/README.md](assets/screenshots/README.md).
 | Demo (`demo_setup.json`) | ~11 | 5 Pro + 5 Con + 1 verdict (+ occasional JSON repair) |
 | Full (`setup.json`) | ~21 | 10 Pro + 10 Con + 1 verdict |
 
-**Measured — full run, session `57cf02c2` (`claude_cli`):** exactly **21 LLM calls** (20 debate turns + 1 verdict), **0 JSON-repair retries**, **~7m45s** wall-clock — roughly **16–35s per turn** (one LLM call at a time, serialized through the Parent). See [examples/](examples/).
+**Measured — full run, session `fe14afde` (`claude_cli`):** exactly **21 LLM calls** (20 debate turns + 1 verdict), **0 JSON-repair retries**, **~7m57s** wall-clock — roughly **15–35s per turn** (one LLM call at a time, serialized through the Parent). See [examples/](examples/).
 
 **Token estimate (Gemini 2.5 Flash + search):** roughly **15k–25k tokens** for demo, **35k–55k** for full — depends on turn length and grounding. (The CLI providers don't report token counts; this is a Gemini-only estimate.)
 

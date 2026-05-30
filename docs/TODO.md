@@ -254,7 +254,7 @@ Re-audit under the strict (raw lines, including blanks/comments) reading of Guid
 
 ## Remaining work for submission
 
-- **End-to-end run:** [x] done — full 10-ping session `57cf02c2` on the `claude_cli` provider (The Godfather wins 84–76), documented in [`examples/`](../examples/) with transcript and verdict JSON.
+- **End-to-end run:** [x] done — full 10-ping session `fe14afde` on the `claude_cli` provider (The Godfather wins 83–78), documented in [`examples/`](../examples/) with transcript and verdict JSON.
 - **Screenshots:** capture terminal `--dry-run`, a live debate, GUI window, a verdict JSON file, and an excerpt of the rotating log. Place in `assets/screenshots/` and link from `README.md`.
 - **Moodle PDF:** each partner submits the same GitHub URL via Moodle (manual step).
 
