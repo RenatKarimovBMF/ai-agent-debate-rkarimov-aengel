@@ -4,7 +4,6 @@ The real ``DebateProcessPool`` and watchdog are swapped for in-process
 fakes so the supervisor event loop is exercised without spawning any OS
 processes.
 """
-
 from __future__ import annotations
 
 import queue
@@ -71,13 +70,15 @@ class _FakeWatchdog:
         self.stopped = True
 
 
-def _orchestrator(monkeypatch, pool, *, timeout=120, callback=None):
+def _orchestrator(monkeypatch, pool, *, timeout=120, callback=None, cancel_event=None):
     monkeypatch.setattr(sup, "setup_logging", lambda *_: None)
     monkeypatch.setattr(sup, "DebateProcessPool", lambda *a, **k: pool)
     monkeypatch.setattr(sup, "ProcessSupervisorWatchdog", _FakeWatchdog)
     cfg = load_config()
     cfg = replace(cfg, debate=replace(cfg.debate, request_timeout_seconds=timeout))
-    return sup.ProcessDebateOrchestrator(cfg, progress_callback=callback)
+    return sup.ProcessDebateOrchestrator(
+        cfg, progress_callback=callback, cancel_event=cancel_event
+    )
 
 
 def test_run_returns_verdict_path_on_done(monkeypatch):
@@ -127,3 +128,22 @@ def test_start_and_stop_watchdogs_delegate(monkeypatch):
     orch.start_watchdogs()
     orch.stop_watchdogs()
     assert orch._watchdog.started and orch._watchdog.stopped
+
+
+def test_run_raises_when_cancelled_via_event(monkeypatch):
+    import threading
+
+    from debate.orchestrator.types import DebateCancelled
+    cancel = threading.Event()
+    cancel.set()
+    pool = _FakePool(FakeQueue([]))
+    orch = _orchestrator(monkeypatch, pool, cancel_event=cancel)
+    with pytest.raises(DebateCancelled, match="stopped by user"):
+        orch.run()
+    assert pool.stopped  # finally-block cleanup still ran
+
+
+def test_request_stop_sets_default_event(monkeypatch):
+    orch = _orchestrator(monkeypatch, _FakePool(FakeQueue([])))
+    orch.request_stop()
+    assert orch._cancel.is_set()

@@ -16,6 +16,7 @@ def start_debate_thread(
     topic: str,
     queue_log: Callable[[str], None],
     on_done: Callable[[Path | None, Exception | None], None],
+    cancel_event: threading.Event | None = None,
 ) -> None:
     def worker() -> None:
         try:
@@ -23,7 +24,9 @@ def start_debate_thread(
             base = load_config()
             config = with_custom_debate(base, pro_side=pro, con_side=con, topic=topic)
 
-            orch = ProcessDebateOrchestrator(config, progress_callback=queue_log)
+            orch = ProcessDebateOrchestrator(
+                config, progress_callback=queue_log, cancel_event=cancel_event
+            )
             orch.start_watchdogs()
 
             try:

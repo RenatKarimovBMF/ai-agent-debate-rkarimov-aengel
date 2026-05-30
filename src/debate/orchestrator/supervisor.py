@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import multiprocessing as mp
 import queue
+import threading
 import time
 import uuid
 from pathlib import Path
@@ -11,7 +12,7 @@ from debate.config import AppConfig
 from debate.logging_setup import setup_logging
 from debate.orchestrator.process_pool import DebateProcessPool
 from debate.orchestrator.supervisor_watchdog import ProcessSupervisorWatchdog
-from debate.orchestrator.types import ProgressCallback
+from debate.orchestrator.types import DebateCancelled, ProgressCallback
 
 logger = logging.getLogger("debate.orchestrator.supervisor")
 
@@ -23,10 +24,12 @@ class ProcessDebateOrchestrator:
         self,
         config: AppConfig,
         progress_callback: ProgressCallback | None = None,
+        cancel_event: threading.Event | None = None,
     ) -> None:
         self.config = config
         self.session_id = str(uuid.uuid4())[:8]
         self._progress_callback = progress_callback
+        self._cancel = cancel_event or threading.Event()
 
         setup_logging(config.logging)
 
@@ -49,6 +52,10 @@ class ProcessDebateOrchestrator:
     def stop_watchdogs(self) -> None:
         self._watchdog.stop()
 
+    def request_stop(self) -> None:
+        """Ask the running debate to stop; ``run`` raises ``DebateCancelled``."""
+        self._cancel.set()
+
     def run(self) -> Path:
         self._pool.start_all(
             on_started=lambda name, pid: self._progress(
@@ -66,6 +73,9 @@ class ProcessDebateOrchestrator:
 
         try:
             while True:
+                if self._cancel.is_set():
+                    raise DebateCancelled("Debate stopped by user")
+
                 if time.time() > deadline:
                     raise TimeoutError("Debate global timeout reached")
 

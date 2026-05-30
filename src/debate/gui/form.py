@@ -17,6 +17,7 @@ class FormWidgets:
     clear_btn: tk.Button
     status: tk.Label
     env_status: tk.Label
+    running_indicator: tk.Label
 
 
 def _build_sides_row(body: tk.Frame) -> tuple[tk.Entry, tk.Entry]:
@@ -84,7 +85,7 @@ def _button(parent: tk.Frame, *, text: str, primary: bool) -> tk.Button:
     )
 
 
-def _build_button_row(body: tk.Frame) -> tuple[tk.Button, tk.Button, tk.Button]:
+def _build_button_row(body: tk.Frame) -> tuple[tk.Button, tk.Button, tk.Button, tk.Label]:
     btn_row = tk.Frame(body, bg=BG)
     btn_row.pack(fill=tk.X, pady=8)
 
@@ -96,13 +97,19 @@ def _build_button_row(body: tk.Frame) -> tuple[tk.Button, tk.Button, tk.Button]:
 
     clear_btn = _button(btn_row, text="Clear log", primary=False)
     clear_btn.pack(side=tk.LEFT, padx=(12, 0))
-    return start_btn, reset_btn, clear_btn
+
+    # Live "debate running" indicator; blank when idle, blinks while active.
+    running_indicator = tk.Label(
+        btn_row, text="", font=("Segoe UI", 11, "bold"), fg="#3fd07a", bg=BG
+    )
+    running_indicator.pack(side=tk.RIGHT, padx=(0, 4))
+    return start_btn, reset_btn, clear_btn, running_indicator
 
 
 def build_form(body: tk.Frame) -> FormWidgets:
     pro_entry, con_entry = _build_sides_row(body)
     topic_entry = _build_topic_entry(body)
-    start_btn, reset_btn, clear_btn = _build_button_row(body)
+    start_btn, reset_btn, clear_btn, running_indicator = _build_button_row(body)
 
     status = tk.Label(body, text="Ready", font=("Segoe UI", 9), fg=MUTED, bg=BG)
     status.pack(anchor=tk.W, pady=(4, 0))
@@ -119,4 +126,5 @@ def build_form(body: tk.Frame) -> FormWidgets:
         clear_btn=clear_btn,
         status=status,
         env_status=env_status,
+        running_indicator=running_indicator,
     )

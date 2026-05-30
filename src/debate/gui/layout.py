@@ -18,6 +18,7 @@ class GuiWidgets:
     clear_btn: tk.Button
     status: tk.Label
     env_status: tk.Label
+    running_indicator: tk.Label
     log: scrolledtext.ScrolledText
 
 
@@ -47,5 +48,6 @@ def build_layout(root: tk.Tk) -> GuiWidgets:
         clear_btn=form.clear_btn,
         status=form.status,
         env_status=form.env_status,
+        running_indicator=form.running_indicator,
         log=log,
     )

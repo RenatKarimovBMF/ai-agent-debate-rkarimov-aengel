@@ -12,15 +12,17 @@ from pathlib import Path
 import pytest
 
 from debate.gui import app as app_mod
+from debate.gui import controls as controls_mod
 
 
 @pytest.fixture
 def gui(monkeypatch):
     calls: dict[str, list] = {"warn": [], "error": [], "info": [], "start": []}
-    monkeypatch.setattr(app_mod.messagebox, "showwarning", lambda *a: calls["warn"].append(a))
-    monkeypatch.setattr(app_mod.messagebox, "showerror", lambda *a: calls["error"].append(a))
-    monkeypatch.setattr(app_mod.messagebox, "showinfo", lambda *a: calls["info"].append(a))
-    monkeypatch.setattr(app_mod, "start_debate_thread", lambda **k: calls["start"].append(k))
+    mb = controls_mod.messagebox
+    monkeypatch.setattr(mb, "showwarning", lambda *a: calls["warn"].append(a))
+    monkeypatch.setattr(mb, "showerror", lambda *a: calls["error"].append(a))
+    monkeypatch.setattr(mb, "showinfo", lambda *a: calls["info"].append(a))
+    monkeypatch.setattr(controls_mod, "start_debate_thread", lambda **k: calls["start"].append(k))
     window = app_mod.DebateGui()
     window.withdraw()
     try:
@@ -43,9 +45,53 @@ def test_defaults_logging_and_status(gui):
 def test_running_ui_toggle(gui):
     window, _ = gui
     window._set_running_ui(True)
-    assert str(window.w.start_btn.cget("state")) == tk.DISABLED
+    assert window.w.start_btn.cget("text") == "Stop debate"
+    assert str(window.w.reset_btn.cget("state")) == tk.DISABLED
     window._set_running_ui(False)
+    assert window.w.start_btn.cget("text") == "Start debate"
+    assert str(window.w.reset_btn.cget("state")) == tk.NORMAL
+
+
+def test_pulse_indicator_blinks_then_clears(gui):
+    window, _ = gui
+    window._running = True
+    window._pulse_indicator()
+    assert window.w.running_indicator.cget("text")  # non-empty while running
+    window._running = False
+    window._pulse_indicator()
+    assert window.w.running_indicator.cget("text") == ""
+
+
+def test_on_stop_requests_cancel(gui):
+    window, _ = gui
+    window._running = True
+    window._set_running_ui(True)
+    window._on_stop()
+    assert window._cancel.is_set()
+    assert "Stopping" in window.w.status.cget("text")
+
+    window._running = False
+    window._cancel.clear()
+    window._on_stop()  # ignored when not running
+    assert not window._cancel.is_set()
+
+
+def test_on_done_cancelled_is_graceful(gui):
+    from debate.orchestrator import DebateCancelled
+
+    window, calls = gui
+    # Simulate a stop: the button is disabled with "Stopping…" first.
+    window._running = True
+    window._set_running_ui(True)
+    window._on_stop()
+    assert str(window.w.start_btn.cget("state")) == tk.DISABLED
+
+    window._on_done(None, DebateCancelled("stopped"))
+    assert window.w.status.cget("text") == "Stopped"
+    assert calls["error"] == []
+    # Regression guard: a new debate must be startable afterwards.
     assert str(window.w.start_btn.cget("state")) == tk.NORMAL
+    assert window.w.start_btn.cget("text") == "Start debate"
 
 
 def test_on_start_valid_launches_worker(gui):

@@ -13,8 +13,9 @@ from debate.gui import runner
 
 
 class _FakeOrchestrator:
-    def __init__(self, config, progress_callback=None) -> None:
+    def __init__(self, config, progress_callback=None, cancel_event=None) -> None:
         self.progress_callback = progress_callback
+        self.cancel_event = cancel_event
 
     def start_watchdogs(self) -> None:
         return None

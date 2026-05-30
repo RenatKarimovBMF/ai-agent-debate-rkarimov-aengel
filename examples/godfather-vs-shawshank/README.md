@@ -20,24 +20,26 @@ uv run python -m debate.main --config config/setup.json
 
 | Field | Value |
 |-------|-------|
-| Session id | `fe14afde` |
+| Session id | `00baf1b0` |
 | LLM provider | `claude_cli` (Claude via the CLI, Claude Pro login) |
 | Topic | Which is the greater film: The Godfather (1972) or The Shawshank Redemption (1994)? |
 | Pings per side | 10 (20 debater turns + 1 verdict = 21 LLM calls) |
-| Wall-clock | ~7m57s (04:29:56 → 04:37:53) |
-| Winner | **CON — The Godfather**, 83 to 78 |
+| Wall-clock | ~9 minutes (started 15:50:42) |
+| Winner | **PRO — The Godfather**, 81 to 77 |
 
 ## Runtime side assignment
 
 The sides are **not** hardcoded; the Parent/Judge assigns them at session
-start, seeded by `session_id`. For `fe14afde` the host announced:
+start, seeded by `session_id`. For `00baf1b0` the host announced:
 
 ```
-PARENT (host): assigning sides — PRO defends 'The Shawshank Redemption',
-CON defends 'The Godfather' (session-seeded, not hardcoded).
+PARENT (host): assigning sides — PRO defends 'The Godfather',
+CON defends 'The Shawshank Redemption' (session-seeded, not hardcoded).
 ```
 
-So in this session PRO argued for *Shawshank* and CON for *The Godfather*.
+So in this session PRO argued for *The Godfather* and CON for *Shawshank* —
+the mirror of the earlier `fe14afde` run, proving the assignment really does
+vary per session.
 
 ## What this example demonstrates
 
@@ -46,25 +48,29 @@ So in this session PRO argued for *Shawshank* and CON for *The Godfather*.
 - **Runtime side assignment** — decided by the host, not the config.
 - **Cited clash** — IMDb Top 250, AFI 100 Years…100 Movies, the Oscars,
   the National Film Registry, BFI Sight & Sound, all cited in-line.
-- **Refute-with-citation rule** — at ping 2, PRO claimed Shawshank ranks
-  AFI #72 (a falsehood); CON refuted it with a cited AFI source and PRO
-  conceded the point, a net loss for PRO.
-- **Research-backed, no-tie verdict** — distinct scores (83 vs 78) tied to
-  the five judging principles.
+- **Refute-with-citation rule** — at ping 9 PRO leaned on the National Film
+  Registry as a ranking ("the archive reached for The Godfather first");
+  CON refuted it by citing the Library of Congress's own statement that the
+  Registry is *not* a ranking and that induction tracks eligibility windows,
+  a clean cited takedown (the rule cuts both ways, not just against one side).
+- **Research-backed, no-tie verdict** — distinct scores (81 vs 77) tied to
+  the five judging principles; CON won the cited NFR exchange, but PRO took
+  the round on Clash and uncontested expert consensus.
 
 ## Verdict (excerpt)
 
 ```
-FINAL VERDICT: CON wins
-PRO score: 78.0
-CON score: 83.0
+FINAL VERDICT: PRO wins
+PRO score: 81.0
+CON score: 77.0
 ```
 
-> "CON ran the tighter, better-diversified case. PRO built almost
-> everything on a single warrant — IMDb's #1 user ranking … CON attacked
-> that warrant repeatedly … landing the decisive observation that The
-> Godfather sits at #2 on the very same IMDb list … CON's convergence
-> frame (AFI #2/#3, two Best Picture wins, Sight & Sound presence,
-> genre-redefining influence) gave it multiple independent lines."
+> "PRO turned CON's IMDb anchor by noting The Godfather sits at #2 on the
+> very same list — establishing rough parity among the popular crowd and
+> forcing the tiebreak onto expert/critical consensus … There PRO held
+> concrete, side-by-side evidence (AFI #2 vs. Shawshank #72 on the same
+> 2007 ballot; the 1973 Best Picture/Actor/Screenplay sweep). CON answered
+> only by impugning the AFI jury … never produced a competing expert
+> ranking. Higher Clash and fewer dropped claims both break to PRO."
 
 The full rationale and persuasion notes are in [`verdict.json`](verdict.json).

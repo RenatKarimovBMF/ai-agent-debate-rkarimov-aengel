@@ -155,40 +155,39 @@ uv run python -m debate.main --config config/demo_setup.json
 
 ## Sample run
 
-A complete, unedited **10-ping** session (`fe14afde`) on the Claude provider — ~7m57s end-to-end, 21 LLM calls. The Parent assigned PRO to *Shawshank* and CON to *The Godfather* at runtime, and **The Godfather (CON) won 83–78**.
+A complete, unedited **10-ping** session (`00baf1b0`) on the Claude provider — ~9 minutes end-to-end, 21 LLM calls. The Parent assigned PRO to *The Godfather* and CON to *Shawshank* at runtime, and **The Godfather (PRO) won 81–77**. (An earlier run, `fe14afde`, assigned the sides the other way and *The Godfather* still won as CON — the assignment really does vary per session.)
 
 **Terminal excerpt:**
 
 ```
-SESSION: fe14afde
+SESSION: 00baf1b0
 TOPIC: Which is the greater film: The Godfather (1972) or The Shawshank Redemption (1994)?
 OPTIONS ON THE TABLE: The Godfather | The Shawshank Redemption
 PINGS PER SIDE: 10
-PARENT (host): assigning sides — PRO defends 'The Shawshank Redemption',
-               CON defends 'The Godfather' (session-seeded, not hardcoded).
+PARENT (host): assigning sides — PRO defends 'The Godfather',
+               CON defends 'The Shawshank Redemption' (session-seeded, not hardcoded).
 
 PING 1/10 — PARENT asks PRO to argue
-PRO says: Let's set the standard. 'Greater' film should mean the work that
-          most successfully achieves its artistic aim and reaches the widest
-          audience… Shawshank has remained the No. 1 film on IMDb's Top 250…
-PRO sources: https://www.imdb.com/chart/top/
+PRO says: Let us define the standard. 'Greater' film … must mean the work of
+          larger artistic consequence … The Godfather rewrote the grammar of
+          the gangster genre … (AFI; National Film Registry, 1990)…
+PRO sources: https://www.afi.com/afis-100-years-100-movies/, https://www.loc.gov/item/prn-15-232/
 
 PING 1/10 — PARENT asks CON to respond
-CON says: IMDb's Top 250 measures popularity among self-selecting voters,
-          not artistic greatness… AFI ranked The Godfather the No. 2
-          American film ever made; Shawshank does not appear…
-CON sources: https://www.afi.com/afis-100-years-100-movies-10th-anniversary-edition/, https://www.oscars.org/oscars/ceremonies/1973
+CON says: Greatness must include the verdict of the global audience … The
+          Shawshank Redemption has held the No. 1 position on IMDb's Top 250…
+CON sources: https://www.loc.gov/programs/national-film-preservation-board/film-registry/, https://www.imdb.com/chart/top/
 
-… (pings 2–10; the round turns on ping 2's refute-with-citation) …
+… (pings 2–10; the round turns on the AFI #2-vs-#72 expert-consensus clash) …
 
 PARENT/JUDGE: Debate finished. Judge is choosing a winner…
-FINAL VERDICT: CON wins
-PRO score: 78.0
-CON score: 83.0
-Verdict saved to: logs/verdict_fe14afde.json
+FINAL VERDICT: PRO wins
+PRO score: 81.0
+CON score: 77.0
+Verdict saved to: logs/verdict_00baf1b0.json
 ```
 
-**Judge summary:** CON ran the tighter, better-diversified case — attacking PRO's single load-bearing warrant (IMDb's #1 user ranking) while stacking convergent professional-consensus evidence (AFI #2, two Best Picture wins, Sight & Sound, genre-redefining influence). The round turned on ping 2: PRO claimed Shawshank ranks AFI #72 (a falsehood); CON refuted it with a cited AFI source and PRO conceded, so under the **refute-with-citation rule** the over-reach cost PRO. No tie — 83 to 78.
+**Judge summary:** A narrow round. CON landed the cleanest cited refutation — using the Library of Congress's own words that the National Film Registry is *not* a ranking — but PRO took the decision on Clash: it turned CON's IMDb anchor (The Godfather sits #2 on the same list), then held uncontested expert consensus (AFI #2 vs. Shawshank #72 on the same 2007 ballot, the 1973 Oscar sweep). CON impugned the AFI jury but never produced a rival expert ranking. No tie — 81 to 77.
 
 **The full session is documented in [examples/godfather-vs-shawshank/](examples/godfather-vs-shawshank/):** the [write-up](examples/godfather-vs-shawshank/README.md), the [turn-by-turn transcript](examples/godfather-vs-shawshank/transcript.md), and the [verdict JSON](examples/godfather-vs-shawshank/verdict.json). A second worked example on a **custom topic** (abortion legality, via `--topic`) lives in [examples/abortion-legality/](examples/abortion-legality/) — see [examples/](examples/) for the index. (`assets/sample-verdict.json` is a minimal schema sample.)
 
@@ -204,7 +203,7 @@ uv run python -m debate.gui
 uv run python -m debate.main --gui
 ```
 
-Set **Side A vs Side B** and the question, then run — same orchestrator as the terminal.
+Set **Side A vs Side B** and the question, then run — same orchestrator as the terminal. While a debate is live, the **Start debate** button turns into **Stop debate** (which cancels the run cleanly) and a blinking "● Debate running" indicator shows it is active. See the [screenshot](#screenshots) below.
 
 > **For grading:** you still need to show `python -m debate.main` from the terminal.
 
@@ -212,16 +211,16 @@ Set **Side A vs Side B** and the question, then run — same orchestrator as the
 
 ## Screenshots
 
-Add PNG captures to `assets/screenshots/` for the README and Moodle PDF:
+The optional Tkinter GUI running a live debate (the **Start debate** button
+becomes **Stop debate** while a round is in progress, with a blinking
+"● Debate running" indicator):
 
-| File | What to capture |
-|------|-----------------|
-| `terminal-dry-run.png` | Output of `--dry-run` |
-| `terminal-debate.png` | Live debate (ping lines + sources) |
-| `gui-debate.png` | Optional GUI window |
-| `verdict-output.png` | Final scores / verdict JSON |
+![GUI running a live debate](assets/screenshots/gui-debate.png)
 
-See [assets/screenshots/README.md](assets/screenshots/README.md).
+More captures can be added to `assets/screenshots/` for the Moodle PDF
+(`terminal-dry-run.png`, `terminal-debate.png`, `verdict-output.png`); the
+terminal flow is also fully documented in [examples/](examples/). See
+[assets/screenshots/README.md](assets/screenshots/README.md).
 
 ---
 

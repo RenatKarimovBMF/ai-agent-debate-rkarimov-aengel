@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 import queue
+import threading
 import tkinter as tk
-from pathlib import Path
-from tkinter import messagebox
 
 from debate.config import load_config
 from debate.env_loader import ensure_env_loaded
-from debate.gui.env_check import resolve_provider_status, validate_inputs
+from debate.gui.controls import DebateControlMixin
+from debate.gui.env_check import resolve_provider_status
 from debate.gui.layout import GuiWidgets, build_layout
-from debate.gui.runner import start_debate_thread
 from debate.gui.theme import BG
 
 
-class DebateGui(tk.Tk):
+class DebateGui(DebateControlMixin, tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title("AI Agent Debate — Exercise 02")
@@ -22,6 +21,8 @@ class DebateGui(tk.Tk):
         self.configure(bg=BG)
 
         self._running = False
+        self._pulse_on = False
+        self._cancel = threading.Event()
         self._log_queue: queue.Queue[str] = queue.Queue()
         self._widgets = build_layout(self)
 
@@ -74,59 +75,3 @@ class DebateGui(tk.Tk):
 
     def _set_status(self, msg: str) -> None:
         self.w.status.config(text=msg)
-
-    def _set_running_ui(self, running: bool) -> None:
-        state = tk.DISABLED if running else tk.NORMAL
-        self.w.start_btn.config(state=state)
-        self.w.reset_btn.config(state=state)
-        self.w.pro_entry.config(state=state)
-        self.w.con_entry.config(state=state)
-        self.w.topic_entry.config(state=state)
-
-    def _on_start(self) -> None:
-        if self._running:
-            return
-
-        pro = self.w.pro_entry.get().strip()
-        con = self.w.con_entry.get().strip()
-        topic = self.w.topic_entry.get().strip()
-
-        error = validate_inputs(pro, con, topic)
-        if error:
-            messagebox.showwarning("Invalid input", error)
-            return
-
-        self._running = True
-        self._set_running_ui(True)
-        self._set_status("Debate running… this can take several minutes.")
-
-        self._log("")
-        self._log("--- New debate started ---")
-        self._log(f"Question: {topic}")
-        self._log(f"Options offered to host: {pro}  |  {con}")
-        self._log("(The Parent/Judge assigns each side to a corner at session start.)")
-        self._log("Live process logs will appear below: supervisor → parent → pro/con → parent.")
-
-        start_debate_thread(
-            pro=pro,
-            con=con,
-            topic=topic,
-            queue_log=self._queue_log,
-            on_done=lambda path, err: self.after(0, lambda: self._on_done(path, err)),
-        )
-
-    def _on_done(self, verdict_path: Path | None, error: Exception | None) -> None:
-        self._running = False
-        self._set_running_ui(False)
-
-        if error:
-            self._set_status("Error")
-            self._log("")
-            self._log(f"ERROR: {error}")
-            messagebox.showerror("Debate failed", str(error))
-            return
-
-        self._set_status("Finished")
-        self._log("")
-        self._log(f"Debate complete. Verdict saved: {verdict_path}")
-        messagebox.showinfo("Done", f"Debate complete.\nVerdict:\n{verdict_path}")
