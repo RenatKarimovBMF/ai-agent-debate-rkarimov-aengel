@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-import multiprocessing as mp
-
 import pytest
 
 from debate.config import load_config
 from debate.models import AgentRole
 from debate.orchestrator.commands import ASSIGN
 from debate.orchestrator.host_protocol import decide_sides, send_assignments
+
+from ._coverage_helpers import FakeQueue
 
 
 def test_decide_sides_is_deterministic_for_same_session():
@@ -44,9 +44,11 @@ def test_decide_sides_env_override_option_b(monkeypatch):
 
 def test_send_assignments_puts_one_message_per_child():
     cfg = load_config()
-    parent_to_pro: mp.Queue = mp.Queue()
-    parent_to_con: mp.Queue = mp.Queue()
-    events: mp.Queue = mp.Queue()
+    # FakeQueue (list-backed) avoids spawning real mp.Queue feeder threads,
+    # which linger and crash under coverage's tracer during GC (CI SIGILL).
+    parent_to_pro: FakeQueue = FakeQueue()
+    parent_to_con: FakeQueue = FakeQueue()
+    events: FakeQueue = FakeQueue()
 
     sides = send_assignments(
         config=cfg,

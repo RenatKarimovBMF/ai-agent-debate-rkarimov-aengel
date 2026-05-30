@@ -40,11 +40,14 @@ def _wait_for_done(monkeypatch, orchestrator_cls):
         done.set()
 
     logs: list[str] = []
-    runner.start_debate_thread(
+    thread = runner.start_debate_thread(
         pro="Cats", con="Dogs", topic="Best pet?",
         queue_log=logs.append, on_done=on_done,
     )
     assert done.wait(timeout=5), "worker thread did not finish"
+    # Join so no daemon thread lingers into later tests (lingering threads
+    # crash under coverage's tracer during GC — see CI SIGILL).
+    thread.join(timeout=5)
     return result, logs
 
 

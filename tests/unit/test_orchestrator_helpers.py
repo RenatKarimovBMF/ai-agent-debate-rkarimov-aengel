@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import multiprocessing as mp
-
 import pytest
 
 from debate.models import AgentRole, DebateMessage, DebatePayload, MessageType
@@ -9,13 +7,16 @@ from debate.orchestrator.commands import relay_message, turn_request, worker_err
 from debate.orchestrator.events import emit_event, queue_get_or_timeout, short_text
 from debate.orchestrator.messages import validate_child_message
 
+from ._coverage_helpers import FakeQueue
+
 
 def test_short_text_truncates():
     assert short_text("a " * 500, limit=20).endswith("...")
 
 
 def test_emit_event_puts_payload():
-    q: mp.Queue = mp.Queue()
+    # FakeQueue avoids a real mp.Queue feeder thread (CI SIGILL under coverage).
+    q: FakeQueue = FakeQueue()
     emit_event(q, "hello", kind="progress", data={"x": 1})
     item = q.get(timeout=1)
     assert item["message"] == "hello"
@@ -23,7 +24,7 @@ def test_emit_event_puts_payload():
 
 
 def test_queue_get_or_timeout_raises():
-    q: mp.Queue = mp.Queue()
+    q: FakeQueue = FakeQueue()
     with pytest.raises(TimeoutError, match="PRO response"):
         queue_get_or_timeout(q, 0.1, "PRO response")
 

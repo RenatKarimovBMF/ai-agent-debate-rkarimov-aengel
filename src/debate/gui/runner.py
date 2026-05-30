@@ -17,7 +17,10 @@ def start_debate_thread(
     queue_log: Callable[[str], None],
     on_done: Callable[[Path | None, Exception | None], None],
     cancel_event: threading.Event | None = None,
-) -> None:
+) -> threading.Thread:
+    """Run a debate on a daemon thread. Returns the thread so callers/tests
+    can join it for clean shutdown."""
+
     def worker() -> None:
         try:
             ensure_env_loaded()
@@ -38,4 +41,6 @@ def start_debate_thread(
         except Exception as exc:
             on_done(None, exc)
 
-    threading.Thread(target=worker, daemon=True).start()
+    thread = threading.Thread(target=worker, daemon=True)
+    thread.start()
+    return thread
