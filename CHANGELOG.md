@@ -97,11 +97,19 @@ repo/CI hygiene.
   sessions, each with a write-up (`README.md`), transcript (`transcript.md`),
   and verdict (`verdict.json`): `godfather-vs-shawshank/` (the default
   topic, `fe14afde`, The Godfather wins 83–78) and `abortion-legality/`
-  (a custom `--topic` run, `c1255aa1`, PRO wins 84–80) which demonstrates
+  (a custom `--topic` run, `507cd011`, Supporting legal abortion access
+  wins 84–80) which demonstrates
   the engine is topic-agnostic. An index `examples/README.md` lists both.
 
 ### Changed
 
+- **Debate progression — less late-round repetition.** `turn_prompt` is now
+  phase-aware (it tells each debater whether it is opening/expanding,
+  developing, or closing, and to stop introducing new analogies and weigh
+  the clash in the final third), and `debate-rebuttal-strategist` gained an
+  "avoid relitigation" rule: a line contested for two pings with no new
+  evidence is called a wash and the debater pivots. Addresses external
+  feedback that debates plateaued on a single analogy in later rounds.
 - **Console no longer truncates debate turns.** The live `PRO says:` /
   `CON says:` lines now print each turn in full instead of cutting at
   ~700 characters mid-sentence. (The judge and the opponent always

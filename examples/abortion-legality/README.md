@@ -24,24 +24,30 @@ uv run python -m debate.main --config config/setup.json `
 
 | Field | Value |
 |-------|-------|
-| Session id | `c1255aa1` |
+| Session id | `507cd011` |
 | LLM provider | `claude_cli` (Claude via the CLI, Claude Pro login) |
 | Topic | Should abortion be legal and accessible? (custom, via `--topic`) |
 | Pings per side | 10 (20 debater turns + 1 verdict = 21 LLM calls) |
-| Wall-clock | ~7m28s (04:17:32 → 04:25:00) |
-| Winner | **PRO — Supporting legal abortion access**, 84 to 80 |
+| Wall-clock | ~8m18s (14:28:27 → 14:36:45) |
+| Side assignment | Parent assigned PRO → *Opposing*, CON → *Supporting* (session-seeded; varies per run) |
+| Winner | **CON — Supporting legal abortion access**, 84 to 80 |
 
 ## What this example demonstrates
 
 - **Topic-agnostic engine** — the motion, sides, and the entire debate were
   supplied with `--topic`/`--pro`/`--con`; nothing about the default film
   debate leaked in. Same code path as the default run.
+- **Runtime side assignment** — the Parent put PRO on *Opposing* and CON on
+  *Supporting* this session (it varies by `session_id`), so the winning side
+  here is defended by CON.
 - **Substantive, cited clash** — both sides argued real jurisprudence and
-  data (*McFall v. Shimp*, WHO, the NBER Dobbs paper, the Turnaway Study,
-  Texas statutes, Stanford/IEP philosophy entries, Guttmacher, CDC). Every
+  data (*McFall v. Shimp*, the Unborn Victims of Violence Act, WHO, the
+  Turnaway Study, Guttmacher, the Commonwealth Fund, Safe Haven laws). Every
   turn carried at least one real source.
-- **Refute-with-citation in action** — the judge credited PRO for turning
-  CON's own JAMA fetal-pain source with a citation in the same turn.
+- **Refute-with-citation, decisively** — at ping 2 PRO cited the Unborn
+  Victims of Violence Act to allege "legal incoherence"; CON quoted the same
+  statute's §1841(c) consent-exclusion clause to show it draws the line at
+  the woman's consent — turning PRO's own evidence against him.
 - **Research-backed, no-tie verdict** — distinct scores (84 vs 80) with a
   rationale tied to the five judging principles (clash, refute-with-citation,
   dropped arguments).
@@ -51,16 +57,18 @@ uv run python -m debate.main --config config/setup.json `
 ## Verdict (excerpt)
 
 ```
-FINAL VERDICT: PRO wins
-PRO score: 84.0
-CON score: 80.0
+FINAL VERDICT: CON wins
+PRO score: 80.0
+CON score: 84.0
 ```
 
-> "The decisive battleground was the bodily-autonomy analogy. CON repeatedly
-> tried to break it on causation, but PRO produced the load-bearing legal
-> counter (*McFall v. Shimp*, plus the delegability point: every parental
-> duty CON cited can be discharged by a third party, whereas gestation
-> cannot…). CON never met the refute-with-citation bar on this central
-> claim … so PRO's strongest line survived to the end."
+> "CON's decisive turn came in ping 2: PRO cited the Unborn Victims of
+> Violence Act for 'legal incoherence,' and CON quoted §1841(c)'s explicit
+> consent exclusion to show the statute draws its line exactly at the
+> woman's consent — a textbook refute-with-citation that PRO never
+> recovered. CON's central asymmetry — that the law nowhere compels even a
+> parent to surrender blood, marrow, or a kidney to a born child (*McFall
+> v. Shimp*) — was pressed every turn and PRO never produced a precedent
+> compelling bodily use."
 
 The full rationale and persuasion notes are in [`verdict.json`](verdict.json).

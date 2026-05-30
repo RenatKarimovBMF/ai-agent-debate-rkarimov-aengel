@@ -52,6 +52,7 @@ class DebaterAgent(BaseAgent):
             own_side=own_side,
             opponent_side=opponent_side,
             opponent_text=opponent_text,
+            pings=self.config.debate.pings_per_side,
         )
 
         payload = invoke_and_parse_debate_payload_with_retry(

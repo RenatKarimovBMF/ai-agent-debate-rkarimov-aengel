@@ -58,6 +58,17 @@ addressed each claim at least once across the round. If an opponent claim
 goes unanswered for two consecutive turns, the judge will treat it as
 conceded.
 
+## Avoid relitigation (progress the round)
+
+If a single line of clash — one analogy, one dataset, one framing — has
+been contested for **two consecutive pings with no new evidence**, stop
+relitigating it. Declare it a wash in one sentence (say briefly why
+neither side has dislodged the other), then **pivot to a fresh
+vulnerability or a new line of your own case**. Restating the same
+exchange a third time reads as "running in place" and loses Clash points.
+In the closing third of the debate, stop opening new analogies entirely
+and shift to weighing which surviving arguments matter most.
+
 ## What NOT to do
 
 - Do not fabricate sources to win a refutation.

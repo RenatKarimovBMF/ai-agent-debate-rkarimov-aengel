@@ -8,7 +8,7 @@ verdict the judge produced (`verdict.json`).
 | Debate | Provider | Pings | Result | Folder |
 |--------|----------|-------|--------|--------|
 | The Godfather vs The Shawshank Redemption (default topic) | `claude_cli` | 10 | CON (The Godfather) wins 83–78 | [godfather-vs-shawshank/](godfather-vs-shawshank/) |
-| Should abortion be legal and accessible? (custom `--topic`) | `claude_cli` | 10 | PRO (Supporting) wins 84–80 | [abortion-legality/](abortion-legality/) |
+| Should abortion be legal and accessible? (custom `--topic`) | `claude_cli` | 10 | Supporting legal abortion access wins 84–80 | [abortion-legality/](abortion-legality/) |
 
 The second example was run with `--topic`/`--pro`/`--con` overrides to
 demonstrate that the engine is **topic-agnostic** — the same orchestrator,

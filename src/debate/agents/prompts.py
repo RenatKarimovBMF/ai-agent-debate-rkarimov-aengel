@@ -53,11 +53,32 @@ Required JSON schema:
 """
 
 
+def _phase_line(ping: int, pings: int) -> str:
+    """Per-phase guidance that pushes the debate forward instead of looping."""
+    if ping <= max(1, pings // 3):
+        return (
+            "Phase — opening/expansion: open a NEW line of argument this turn; "
+            "do not restate framing you have already made."
+        )
+    if ping <= (2 * pings) // 3:
+        return (
+            "Phase — development: deepen with fresh evidence or a new angle. "
+            "If a point has been contested for two turns with no new evidence, "
+            "call it a wash and pivot to a different line."
+        )
+    return (
+        "Phase — closing: stop introducing new analogies. Weigh the clash, "
+        "explain why your surviving points outweigh the opponent's, and "
+        "crystallize. Do not relitigate settled lines."
+    )
+
+
 def turn_prompt(
     ping: int,
     own_side: str,
     opponent_side: str,
     opponent_text: str | None,
+    pings: int = 10,
 ) -> str:
     if opponent_text:
         opponent_part = (
@@ -77,9 +98,11 @@ def turn_prompt(
         )
 
     return f"""
-Ping {ping}. Argue for {own_side}.
+Ping {ping} of {pings}. Argue for {own_side}.
 
 {opponent_part}
+
+{_phase_line(ping, pings)}
 
 Return ONLY the required JSON object.
 Do not use markdown.

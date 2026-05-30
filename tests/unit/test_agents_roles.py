@@ -39,6 +39,17 @@ def test_turn_prompt_with_opponent():
 def test_turn_prompt_opening():
     text = turn_prompt(1, "Godfather", "Shawshank", None)
     assert "opening statement" in text
+    assert "opening/expansion" in text
+
+
+def test_turn_prompt_development_phase():
+    text = turn_prompt(5, "A", "B", "prev", pings=10)
+    assert "development" in text
+
+
+def test_turn_prompt_closing_phase():
+    text = turn_prompt(9, "A", "B", "prev", pings=10)
+    assert "closing" in text and "crystallize" in text
 
 
 def _llm_json(text: str = "Our side wins.") -> str:

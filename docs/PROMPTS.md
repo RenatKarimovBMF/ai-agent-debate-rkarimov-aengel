@@ -71,8 +71,12 @@ just decoration.
 
 ### Why each block is there
 
-- **Ping number** — the model uses it to pace itself (e.g. avoid
-  spending its strongest argument on ping 1 when there are 10 pings).
+- **Ping number + phase line** — the turn shows `Ping X of N` and a
+  phase instruction (`_phase_line`): opening/expansion early, development
+  in the middle, and closing in the final third (weigh the clash, stop
+  introducing new analogies). This pushes the debate to progress rather
+  than relitigate one analogy every round — paired with the
+  "avoid relitigation" rule in `debate-rebuttal-strategist`.
 - **`This is the opening statement` branch** — opening turns have no
   opponent text to react to, so we explicitly tell the model to define
   the standard for winning first. The instruction is motion-agnostic:
