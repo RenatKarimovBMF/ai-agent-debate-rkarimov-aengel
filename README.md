@@ -18,8 +18,9 @@
 </p>
 
 <p align="center">
-  <strong>Which is the greater film?</strong><br/>
-  Three AI agents argue it out — with live web citations — and a judge picks a winner. No ties.
+  <strong>Which is the greater film — The Godfather or The Shawshank Redemption?</strong><br/>
+  Three AI agents argue it out — each turn backed by a cited source — and a judge picks a winner. No ties.<br/>
+  <em>That's the default debate; the engine is topic-agnostic — point it at any motion with <code>--topic</code>.</em>
 </p>
 
 <p align="center">

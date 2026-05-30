@@ -1,7 +1,7 @@
 # Architecture — AI Agent Debate (Exercise 02)
 
 **Team:** Renat Karimov, Alon Engel  
-**Topic:** The Godfather vs The Shawshank Redemption
+**Default topic:** The Godfather vs The Shawshank Redemption (the engine is topic-agnostic — any motion via `--topic`)
 
 ## Class diagram (Mermaid)
 
