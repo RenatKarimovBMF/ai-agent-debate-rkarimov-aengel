@@ -29,7 +29,38 @@
 
 ---
 
-## What you get
+## Table of contents
+
+- [Features](#features)
+- [How it works](#how-it-works)
+- [Quick start](#quick-start-about-5-minutes)
+- [Sample run](#sample-run)
+- [Optional GUI](#optional-gui)
+- [Screenshots](#screenshots)
+- [API usage & cost](#api-usage--cost)
+- [For graders & reviewers](#for-graders--reviewers)
+- [Project layout](#project-layout)
+- [Submission](#submission-pairs)
+
+---
+
+## Features
+
+- **Mediated multi-agent debate** — `Pro`, `Con`, and a `Parent/Judge`; debaters never talk to each other, every turn is relayed through the Parent.
+- **Real OS-level multiprocessing** — three `spawn`ed worker processes exchanging JSON messages over queues, run by a supervisor with a per-process watchdog (keepalive + restart).
+- **Runtime side assignment** — the Parent assigns sides per session, seeded by the session id, so they vary across runs and are never hardcoded.
+- **Topic-agnostic engine** — ships with the film debate as the default, but runs any motion via `--topic`.
+- **Three LLM providers, auto-selected** — Claude CLI (subscription) → Anthropic API → Gemini (free tier), or force one with `LLM_PROVIDER`.
+- **Research-backed judging** — a WUDC / IDEA / NSDA-derived rubric (Matter · Manner · Method · Clash · Burden) and five judging principles; **no ties allowed**.
+- **Refute-with-citation rule** — lies are permitted, but a bare contradiction is not a refutation; alleging a falsehood requires a cited source in the same turn.
+- **Project-local Agent Skills** — six skills under `.claude/skills/`, loaded natively by the Claude CLI and injected into the prompt for the API providers.
+- **Gatekeeper + structured logging** — config-driven rate/budget limits; rotating JSONL logs and a machine-readable JSON verdict.
+- **Fully config-driven** — every knob lives in versioned JSON; the version is validated against the code at load.
+- **Strong quality bar** — genuine **100% test coverage** (266 tests), `ruff` + `mypy` clean, every `.py` ≤ 150 lines, CI on Python 3.11–3.13.
+
+---
+
+## How it works
 
 | Agent | Role | Job |
 |-------|------|-----|
@@ -37,15 +68,20 @@
 | **Con** | Debater | Defends the opposing side |
 | **Parent / Judge** | Host | Assigns the sides, relays every message, declares a winner |
 
-The two sides come from config (default: *The Godfather* vs *The Shawshank Redemption*), but **the Parent decides which agent defends which side at runtime** — seeded by the session id, so it varies across runs and is never hardcoded.
+The two sides come from config (default: *The Godfather* vs *The Shawshank Redemption*), but **the Parent decides which agent defends which side at runtime** — seeded by the session id, so it varies across runs and is never hardcoded. Agents never talk to each other directly — every turn goes through the **Parent**, like a moderated panel.
 
-Agents never talk to each other directly — every turn goes through the **Parent**, like a moderated panel.
+```mermaid
+flowchart LR
+    CLI["debate.main (CLI / GUI)"] --> SUP["Supervisor + Watchdog"]
+    SUP --> PRO["Pro process"]
+    SUP --> PAR["Parent / Judge process"]
+    SUP --> CON["Con process"]
+    PRO <-->|"JSON via queue"| PAR
+    CON <-->|"JSON via queue"| PAR
+    PAR --> OUT[("verdict JSON + JSONL logs")]
+```
 
-```
-Pro  →  Parent  →  Con  →  Parent  →  Pro  →  …  (10 rounds by default)
-                              ↓
-                    verdict saved to logs/
-```
+Each ping is one LLM call per side, serialized through the Parent: `Pro → Parent → Con → Parent → …` for 10 rounds by default, after which the Parent scores the transcript and writes a no-tie verdict to `logs/`. Full design: [docs/architecture.md](docs/architecture.md) · [docs/PLAN.md](docs/PLAN.md).
 
 ---
 
