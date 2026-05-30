@@ -52,7 +52,7 @@ Copy `.env.example` to `.env` and fill in at least one of
 
 ```
 uv run ruff check src tests scripts  # zero violations
-uv run pytest --cov                  # 193 tests, fail_under = 100% on in-scope code
+uv run pytest --cov                  # 266 tests, fail_under = 100% (omit list empty)
 uv run python -m debate.main --dry-run --config config/setup.json
                                      # the CLI must still load
 make cap                             # every .py file under src/tests/scripts <= 150 lines

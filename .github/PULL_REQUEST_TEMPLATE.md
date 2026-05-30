@@ -28,8 +28,7 @@ uv run python scripts/check_line_cap.py
 ```
 
 - [ ] `ruff check` is clean.
-- [ ] `pytest --cov` exits 0; coverage stays at 100% on the in-scope
-      code.
+- [ ] `pytest --cov` exits 0; coverage stays at 100% (omit list empty).
 - [ ] Every `.py` file under `src/`, `tests/`, `scripts/` is at most
       150 raw lines (PRD NFR-01).
 - [ ] No Hebrew text was introduced (NFR-10).

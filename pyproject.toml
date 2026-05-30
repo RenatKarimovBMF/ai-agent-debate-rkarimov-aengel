@@ -47,23 +47,10 @@ pythonpath = ["src"]
 
 [tool.coverage.run]
 source = ["src/debate", "src/sdk"]
-omit = [
-    "*/debate/test_gemini.py",
-    "*/debate/gui/*",
-    "*/debate/main.py",
-    "*/debate/process_orchestrator.py",
-    "*/debate/single_orchestrator.py",
-    "*/debate/orchestrator/child_worker.py",
-    "*/debate/orchestrator/parent_worker.py",
-    "*/debate/orchestrator/ping_round.py",
-    "*/debate/orchestrator/process_pool.py",
-    "*/debate/orchestrator/supervisor.py",
-    "*/debate/orchestrator/supervisor_watchdog.py",
-    "*/debate/legacy/session_loop.py",
-    "*/debate/legacy/ping_runner.py",
-    "*/debate/legacy/debate_orchestrator.py",
-    "*/debate/transport/fifo.py",
-]
+# No omit entries: every runtime module under src/ is covered by real
+# tests. The former manual Gemini smoke script lives in
+# scripts/manual_gemini_check.py (outside the coverage source tree).
+omit = []
 
 [tool.coverage.report]
 fail_under = 100

@@ -202,7 +202,7 @@ Final pre-submission polish: align the project with Software Submission Guidelin
 | S14-06 | `docs/adr/` split into ten per-decision files (Michael Nygard template) | Alon | [x] |
 | S14-07 | `pyproject.toml` coverage scope + `fail_under = 100` | Renat | [x] |
 | S14-08 | Targeted `tests/unit/test_*_coverage.py` files (one per module) cover every remaining branch under the 150-line cap | Alon | [x] |
-| S14-09 | Coverage = 100% on in-scope code (191 unit tests) | Both | [x] |
+| S14-09 | Coverage = 100% (omit list later emptied; 263 unit + 3 integration tests) | Both | [x] |
 
 ---
 
@@ -244,7 +244,7 @@ Re-audit under the strict (raw lines, including blanks/comments) reading of Guid
 | PRD / PLAN / TODO / PROMPTS | [x] |
 | Mechanism PRDs (orchestrator / gatekeeper / SDK / judge rubric) | [x] |
 | Full run screenshots | [ ] add to assets/screenshots/ |
-| 85% coverage | [x] (100% on in-scope code; gate at 100) |
+| 85% coverage | [x] (genuine 100%, omit list empty; gate at 100) |
 | 150-line file limit (raw lines, strict) | [x] (largest 138) |
 | UV + uv.lock | [x] |
 | JSON config in `config/` with `"version"` key + validator | [x] |

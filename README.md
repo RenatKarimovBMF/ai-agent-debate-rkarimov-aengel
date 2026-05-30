@@ -1,7 +1,7 @@
 # AI Agent Debate
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-193%20passing-brightgreen.svg)](#tests)
+[![Tests](https://img.shields.io/badge/tests-266%20passing-brightgreen.svg)](#tests)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-brightgreen.svg)](https://docs.astral.sh/ruff/)
 [![Line cap](https://img.shields.io/badge/file%20size-%E2%89%A4%20150%20lines-brightgreen.svg)](scripts/check_line_cap.py)
@@ -219,7 +219,7 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 | PRD / PLAN / TODO | [docs/](docs/) |
 | ADRs (per architectural decision) | [docs/adr/](docs/adr/) |
 | Prompt book (every LLM-facing prompt) | [docs/PROMPTS.md](docs/PROMPTS.md) |
-| Tests + 100% coverage on in-scope code | 193 tests · `uv run pytest --cov` |
+| Tests + 100% coverage (every runtime module; omit list empty) | 266 tests · `uv run pytest --cov` |
 | Strict 150-line cap per `.py` file | `uv run python scripts/check_line_cap.py` |
 | CI (ruff + cap + tests on Python 3.11 / 3.12 / 3.13) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
 | Version tracking (code + config in lock-step) | `__version__` + `version` key validated at load |
@@ -230,7 +230,7 @@ Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interva
 ```powershell
 uv run python scripts/check_line_cap.py    # every .py <= 150 raw lines
 uv run ruff check src tests scripts        # zero violations
-uv run pytest --cov                        # 193 tests, fail_under = 100%
+uv run pytest --cov                        # 266 tests, fail_under = 100%
 ```
 
 Or `make check` for all three in one go.
@@ -246,8 +246,8 @@ ai-agent-debate-rkarimov-aengel/
 ├── config/                 setup.json, rate_limits.json (+ demo variants, version-stamped)
 ├── src/debate/             orchestrator, agents, gatekeeper, transport, GUI, watchdog
 ├── src/sdk/                Gemini / Anthropic / Claude-CLI LLM clients
-├── tests/unit/             191 targeted unit tests (each *_coverage.py < 150 lines)
-├── tests/integration/      2 config-scaffold tests
+├── tests/unit/             263 targeted unit tests (each file < 150 lines)
+├── tests/integration/      3 tests (config scaffold + end-to-end debate)
 ├── scripts/                check_line_cap.py (150-line gate)
 ├── docs/                   PRD, PLAN, TODO, PROMPTS, KNOWN_LIMITATIONS, architecture
 ├── docs/adr/               10 architectural decision records + index

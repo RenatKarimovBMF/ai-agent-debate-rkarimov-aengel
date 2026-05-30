@@ -102,7 +102,7 @@ Sides are no longer hardcoded to a class — the Parent assigns them at the star
 
 - **FR-24:** `python -m debate.main` — primary CLI entry. Supports `--version`, `--dry-run`, `--gui`, and topic overrides.
 - **FR-25:** `python -m debate.gui` — optional GUI (same orchestrator).
-- **FR-26:** `python -m debate.test_gemini` — single-call API smoke test.
+- **FR-26:** `uv run python scripts/manual_gemini_check.py` — single-call API smoke test.
 
 ### 4.9 Skills, judging, and debate rules
 
@@ -118,11 +118,11 @@ Sides are no longer hardcoded to a class — the Parent assigns them at the star
 | ID | Requirement | Target | Status |
 |----|-------------|--------|--------|
 | NFR-01 | Code file length | ≤ 150 raw lines per file (Guidelines V3 §5.2; strict count) | met (largest: `config/loader.py` at 138) |
-| NFR-02 | Test coverage | ≥ 85% | met (100% on in-scope code; 191 unit tests; coverage gate `fail_under = 100`) |
+| NFR-02 | Test coverage | ≥ 85% | met (genuine 100%, omit list empty; 263 unit + 3 integration tests; gate `fail_under = 100`) |
 | NFR-03 | Linting | Zero Ruff errors | met |
 | NFR-04 | Package manager | `uv` + `uv.lock` (no `requirements.txt`) | met |
 | NFR-05 | OOP design | Clear separation: models, agents, orchestrator, SDK, transport | met |
-| NFR-06 | TDD | Unit tests in `tests/unit/`, integration in `tests/integration/` | met (191 unit tests at v1.00) |
+| NFR-06 | TDD | Unit tests in `tests/unit/`, integration in `tests/integration/` | met (263 unit + 3 integration tests) |
 | NFR-07 | Documentation | PRD, PLAN, TODO, PROMPTS, mechanism PRDs, architecture diagram, README | met |
 | NFR-08 | Cost transparency | Prompt log (`docs/PROMPTS.md`) + token/cost notes in README | met |
 | NFR-09 | Version tracking | `__version__` in code + `"version"` in every JSON config, validated on load | met |

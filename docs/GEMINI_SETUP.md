@@ -60,7 +60,7 @@ Google says the key in `.env` is no longer valid.
 1. Go to **https://aistudio.google.com/apikey**
 2. **Create API key** (new one)
 3. Replace the line in `.env`: `GEMINI_API_KEY=AIza...` (new value)
-4. **New terminal** → `uv run python -m debate.test_gemini`
+4. **New terminal** → `uv run python scripts/manual_gemini_check.py`
 
 Do not reuse an old copied key from chat or email.
 
@@ -74,7 +74,7 @@ Often means:
 4. **Test one call** before full debate:
 
 ```powershell
-uv run python -m debate.test_gemini
+uv run python scripts/manual_gemini_check.py
 ```
 
 ## Troubleshooting

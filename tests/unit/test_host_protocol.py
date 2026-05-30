@@ -78,6 +78,9 @@ def test_debater_agent_uses_runtime_assignment():
     from debate.gatekeeper import Gatekeeper
 
     class _DummyClient:
+        def active_provider(self) -> str:
+            return ""
+
         def complete(self, system, user):  # pragma: no cover - not exercised
             raise NotImplementedError
 

@@ -319,7 +319,7 @@ docs/
 |-------|-------|----------|
 | Unit | Models, config, gatekeeper, SDK mocks | `tests/unit/` |
 | Integration | Orchestrator flow with mocked LLM | `tests/integration/` |
-| Smoke | `test_gemini.py` manual API check | `debate.test_gemini` |
+| Smoke | `manual_gemini_check.py` manual API check | `scripts/manual_gemini_check.py` |
 
 **Coverage target:** 85% measured with `pytest-cov` after Stage 8.
 

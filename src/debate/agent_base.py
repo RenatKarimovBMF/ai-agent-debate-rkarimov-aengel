@@ -37,10 +37,15 @@ class BaseAgent(ABC):
     def system_prompt(self) -> str: ...
 
     def _active_provider(self) -> str:
-        """Best-effort name of the provider that will serve this agent."""
+        """Best-effort name of the provider that will serve this agent.
+
+        `active_provider()` raises RuntimeError when a provider is forced
+        but its key is missing; in that case we simply skip skill
+        injection rather than fail prompt construction.
+        """
         try:
             provider = self.client.active_provider()
-        except Exception:
+        except RuntimeError:
             return ""
         return provider if isinstance(provider, str) else ""
 

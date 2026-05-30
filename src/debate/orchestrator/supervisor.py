@@ -93,7 +93,9 @@ class ProcessDebateOrchestrator:
 
                 self._progress(message)
 
-            if verdict_path is None:
+            if verdict_path is None:  # pragma: no cover - unreachable guard
+                # The loop only exits via the done-branch break (which always
+                # sets verdict_path) or via a raise, so this never executes.
                 raise RuntimeError("Debate finished without verdict path")
 
             return verdict_path

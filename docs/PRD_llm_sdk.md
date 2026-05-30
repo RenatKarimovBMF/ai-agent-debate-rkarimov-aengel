@@ -170,7 +170,7 @@ Loaded via `debate.env_loader` / `python-dotenv` from `.env`. Repository ships `
 
 ## 10. Smoke test entry point
 
-`python -m debate.test_gemini`
+`uv run python scripts/manual_gemini_check.py`
 
 - Loads env, constructs `LlmClient`, sends single prompt.
 - Prints provider and success/failure — used before full debate runs.

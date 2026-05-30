@@ -8,6 +8,7 @@ construction in every module.
 
 from __future__ import annotations
 
+import queue as _queue
 from unittest.mock import MagicMock
 
 from debate.config import GatekeeperConfig
@@ -54,4 +55,32 @@ def make_message(
     )
 
 
-__all__ = ["MagicMock", "make_gatekeeper", "make_message", "make_payload"]
+class FakeQueue:
+    """In-process stand-in for ``multiprocessing.Queue``.
+
+    Backed by a list so worker loops can be driven deterministically
+    without spawning OS processes. ``get`` raises ``queue.Empty`` when
+    drained so ``queue_get_or_timeout`` exercises its timeout branch.
+    """
+
+    def __init__(self, items: list | None = None) -> None:
+        self.items: list = list(items or [])
+        self.puts: list = []
+
+    def put(self, item: object) -> None:
+        self.items.append(item)
+        self.puts.append(item)
+
+    def get(self, timeout: float | None = None) -> object:
+        if not self.items:
+            raise _queue.Empty
+        return self.items.pop(0)
+
+
+__all__ = [
+    "FakeQueue",
+    "MagicMock",
+    "make_gatekeeper",
+    "make_message",
+    "make_payload",
+]

@@ -84,23 +84,23 @@ architecture the assignment asks for.
   10 pings) versus `python -m debate.main --config
   config/demo_setup.json`. The README quotes both.
 
-## L-07: Coverage skips OS- and network-specific code paths
+## L-07: Coverage is 100% in-process; real processes/APIs are simulated
 
-- **Description:** the coverage scope (`pyproject.toml` ->
-  `tool.coverage.run`) omits `transport/fifo.py` (Unix-only — uses
-  `os.mkfifo`), `legacy/ping_runner.py` (reference single-process
-  driver), `gui/*` (Tkinter event loop), and the multiprocess
-  worker entry points (`orchestrator/*_worker.py`,
-  `orchestrator/supervisor*.py`). Real Gemini / Anthropic API call
-  sites in `sdk/*_client.py` are exercised via mocks rather than
-  network calls.
-- **Impact:** the 100% number is "100% of the in-scope code", which
-  is the deterministic logic. The omitted parts are covered by the
-  smoke test (`python -m debate.main --dry-run`) and the manual
-  full-debate runs documented in the README.
-- **Workaround:** to include Unix FIFOs in coverage, drop the omit
-  line for `transport/fifo.py` and run the suite on Linux/macOS; the
-  existing tests parametrise the transport choice.
+- **Description:** the coverage `omit` list is **empty** — every runtime
+  module is covered, including the orchestrator workers, supervisor,
+  process pool, the Unix-only `transport/fifo.py` (its `os.mkfifo` /
+  `select` primitives are monkeypatched so the logic runs on Windows),
+  the GUI, and `main.py`. What the tests deliberately do **not** do is
+  spawn real OS processes or make real Gemini/Anthropic network calls —
+  multiprocessing primitives and the LLM client are faked in-process.
+- **Impact:** the 100% number reflects the actual code, but it proves
+  *logic*, not real cross-process IPC timing or live API behaviour.
+  Those are validated by the manual full-debate run documented in
+  `examples/` and by the `--dry-run` smoke path.
+- **Workaround:** for true cross-process / live-API validation, run the
+  end-to-end debate against a real provider (see `docs/CLAUDE_SETUP.md`
+  or `docs/GEMINI_SETUP.md`); the in-process suite is the fast,
+  deterministic gate.
 
 ## L-08: Verdict tie-break is deterministic but coarse
 

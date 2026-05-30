@@ -34,6 +34,18 @@ repo/CI hygiene.
   `src/`, `tests/`, **and** `scripts/`, so the 150-line rule cannot be
   silently broken by a new test file or helper script.
 
+### Changed
+
+- **Coverage is now genuinely 100% — the `omit` list is empty.** Every
+  previously-excluded runtime module is covered by real in-process tests:
+  the orchestrator workers, supervisor, process pool, watchdog, the legacy
+  reference orchestrator, `transport/fifo.py` (Unix `os.mkfifo`/`select`
+  monkeypatched), the GUI, and `main.py` — plus an end-to-end debate test
+  with a fake LLM. Tests do not spawn real OS processes or call live APIs
+  (those remain simulated; see KNOWN_LIMITATIONS L-07). 266 tests total.
+  The manual Gemini check script moved to `scripts/manual_gemini_check.py`
+  (out of the coverage source tree).
+
 ### Fixed
 
 - **Project-root resolution when run as an installed package.**
@@ -95,7 +107,7 @@ repo/CI hygiene.
   config-scaffold tests and never touch Gemini or Anthropic.
 - **Documentation counts refreshed.** README badge, `CONTRIBUTING.md`
   gate snippet, and PR-template checklist updated to the actual figures
-  (193 tests; `fail_under = 100`).
+  (266 tests; `fail_under = 100`).
 
 ## [1.00] — 2026-05-27
 

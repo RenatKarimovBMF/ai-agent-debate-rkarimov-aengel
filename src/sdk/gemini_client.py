@@ -79,13 +79,14 @@ class GeminiAgentClient:
                 "1. Open https://aistudio.google.com/apikey\n"
                 "2. Delete the old key (or create a new one)\n"
                 "3. Paste the NEW key into .env → GEMINI_API_KEY=AIza...\n"
-                "4. Close terminal, open a new one, run: python -m debate.test_gemini"
+                "4. Close terminal, open a new one, run: "
+                "uv run python scripts/manual_gemini_check.py"
             ) from None
 
         raise RuntimeError(
             "All Gemini models failed. Try:\n"
             "1. New API key at https://aistudio.google.com/apikey\n"
-            "2. Run: python -m debate.test_gemini\n"
+            "2. Run: uv run python scripts/manual_gemini_check.py\n"
             "3. If quota is 0, your region may block free tier — ask lecturer\n\n"
             + "\n".join(errors[-4:])
         )

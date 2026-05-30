@@ -1,4 +1,9 @@
-"""Quick one-call Gemini test. Run: python -m debate.test_gemini"""
+"""Quick one-call Gemini test. Run: uv run python scripts/manual_gemini_check.py
+
+Manual API-check script (not library code, not covered by the test
+suite). It calls the real Gemini API, so it is kept out of the coverage
+``source`` tree and excluded from automated runs.
+"""
 
 from __future__ import annotations
 
