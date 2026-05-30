@@ -25,7 +25,9 @@ class ClaudeAgentClient:
         cli_command: str = "claude",
         workdir: Path | None = None,
         timeout_seconds: int = 120,
+        web_search: bool = False,
     ) -> None:
+        self._web_search = web_search
         configured = os.environ.get("CLAUDE_CLI_PATH", cli_command)
         # On Windows the CLI is a `claude.cmd` / `claude.ps1` shim that
         # CreateProcess cannot find from the bare name, so resolve the
@@ -102,12 +104,33 @@ class ClaudeAgentClient:
                 "ANTHROPIC_API_KEY not set. Copy .env.example to .env and add your API key."
             )
         client = anthropic.Anthropic(api_key=api_key)
-        message = client.messages.create(
-            model=model,
-            max_tokens=2048,
-            system=system,
-            messages=[{"role": "user", "content": user}],
-            timeout=self._timeout,
-        )
-        text = message.content[0].text  # type: ignore[union-attr]
+        kwargs: dict = {
+            "model": model,
+            "max_tokens": 2048,
+            "system": system,
+            "messages": [{"role": "user", "content": user}],
+            "timeout": self._timeout,
+        }
+        if self._web_search:
+            # GA managed web-search tool (no beta header needed). Lets the
+            # Anthropic path ground citations in real sources, matching the
+            # Claude CLI and Gemini-grounding paths.
+            kwargs["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
+        message = client.messages.create(**kwargs)
+        text = _extract_text(message.content)
         return ClaudeResponse(text=text, raw=text)
+
+
+def _extract_text(content: list) -> str:
+    """Concatenate the text blocks of an Anthropic response.
+
+    With the web-search tool the response interleaves tool-use and
+    search-result blocks (which carry no string `.text`) with the final
+    answer's text blocks; we keep only the latter.
+    """
+    parts = [
+        block.text
+        for block in content
+        if isinstance(getattr(block, "text", None), str)
+    ]
+    return "".join(parts).strip()

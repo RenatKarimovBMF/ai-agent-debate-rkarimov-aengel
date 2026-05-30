@@ -266,14 +266,21 @@ Re-audit under the strict (raw lines, including blanks/comments) reading of Guid
 
 ---
 
-## Next session (parked 2026-05-30)
+## Next session (parked 2026-05-30, updated 2026-05-30 PM)
 
-Today's validation is green: 270 tests pass, 100% coverage, Ruff clean, files ≤150 lines, CLI `--dry-run` wires correctly. Six modified files are ready to commit. Pick up here, in order:
+Progress this session — all gates green (281 tests, 100% coverage, Ruff + mypy clean, files ≤150 lines):
 
-1. **(1) Screenshots + posters** — capture terminal `--dry-run`, live debate, GUI, verdict JSON; add real `assets/posters/*.jpg` and `assets/screenshots/*.png`; fix the broken README image links.
-2. **(2) Web-search on the Anthropic path** — `sdk/claude_client.prompt_api` sends no search tool, so citations there can be fabricated. Wire a real web-search tool (or document that the representative run uses Claude CLI / Gemini grounding where search is active).
-3. **(3) Judge mid-debate intervention** — orchestrator should detect over-agreement / off-side turns and re-prompt the child, not only score at the end.
-4. **(§9) Research notebook** — `notebooks/analysis.ipynb`: run the debate N times and plot win-rate by side (proves runtime assignment is unbiased), citations/turn, tokens/turn, score spread; pull data from `logs/`. Add `results/` for outputs.
-5. **(§13, maybe) ISO/IEC 25010 mapping** — short quality-characteristics table in `PLAN.md`.
-6. **(optional)** Crash-recovery resume from saved session JSONL.
-7. **(optional)** `docs/DECISIONS.md` decision-journal / memory file.
+- [x] **(2) Web-search on the Anthropic path** — added `llm.anthropic_web_search` flag; `prompt_api` attaches the GA `web_search_20250305` tool + `_extract_text`. Gemini grounding already on; Claude CLI built-in. (ADR-011)
+- [x] **(3) Judge mid-debate intervention** — `orchestrator/intervention.py` (`capitulation_warning` + `solicit_turn`); one ringside re-ask threaded through `turn_request → child_worker → build_turn → turn_prompt`. (ADR-012)
+- [x] **(§9) Research notebook** — tested `debate.analysis` module + `notebooks/analysis.ipynb` + `results/` charts; `analysis` uv extra. (PLAN §14)
+- [x] **(§13) ISO/IEC 25010 mapping** — added to `PLAN.md` §13.
+
+Also done:
+
+- [x] **Decision journal** — `docs/DECISIONS.md` added (continuity aid, separate from PRD/PLAN).
+- [x] **(§11) Cost analysis** — README now has a per-model token/cost table + optimization strategies.
+- [x] **Crash-recovery resume — declined (won't-do).** The watchdog already keep-alives + restarts dead workers mid-session, so disk-based resume is redundant. Documented as KNOWN_LIMITATIONS L-11 and ADR-013.
+
+Remaining:
+
+1. **(1) Screenshots + posters** — *deferred by user (doing later).* Examples cover the CLI; user will add a GUI screenshot. Still need real `assets/posters/*.jpg` + `assets/screenshots/*.png` and to fix the broken README image links.

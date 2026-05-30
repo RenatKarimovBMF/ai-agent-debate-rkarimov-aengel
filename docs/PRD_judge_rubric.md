@@ -36,21 +36,68 @@ to identify principles that translate into an LLM judge prompt:
    each round with no prior view on the topic and accepts only what the
    debaters establish.
 
-## 3. Rubric (operationalised in `debate-judge-rubric` skill)
+## 3. The scoring system (how points are awarded)
 
-| Category | Weight | Source |
-|----------|-------:|--------|
-| Matter   | 30 | WUDC |
-| Manner   | 15 | WUDC |
-| Method   | 15 | WUDC |
-| Clash    | 25 | IDEA (Karl Popper) |
-| Burden   | 15 | NSDA |
-| **Total**| **100** | — |
+Each side is scored **0–100** as the sum of five weighted categories. The
+weights and what each measures:
 
-Per-category band tables, dropped-claim handling, the "refute a lie with a
-citation" rule, and tie-breaking order are specified in the
-`debate-judge-rubric` skill file. They are not repeated here to keep the
-PRD as a living-decisions document rather than a duplicate spec.
+| Category | Weight | Source | Measures |
+|----------|-------:|--------|----------|
+| Matter   | 30 | WUDC | Substance, evidence quality, logical chain. |
+| Clash    | 25 | IDEA (Karl Popper) | Direct engagement with the opponent's actual claim. |
+| Manner   | 15 | WUDC | Clarity, tone, respect, word economy. |
+| Method   | 15 | WUDC | Structure, signposting, format/word-cap adherence. |
+| Burden   | 15 | NSDA | Carrying the burden of proof; answering dropped claims. |
+| **Total**| **100** | — | Sum of the above. |
+
+### 3.1 Per-category bands
+
+The judge places each side in a band per category (full tables in the
+`debate-judge-rubric` skill); summarised:
+
+- **Matter (0–30):** 27–30 multi-warrant + strong sources, no gaps; 20–26
+  solid with ≥1 cited source/turn; 13–19 mostly assertion; 0–12 empty or
+  hallucinated facts caught by the opponent.
+- **Clash (0–25):** 22–25 names the opponent's claim, attacks the warrant,
+  and weighs it; 16–21 engages most points; 9–15 often talks past; 0–8
+  parallel monologues.
+- **Manner (0–15):** 13–15 clear/respectful/economical … 0–3 insults or
+  unintelligible.
+- **Method (0–15):** 13–15 every turn signposts claim→warrant→impact and
+  respects the cap … 0–3 no structure / format violations.
+- **Burden (0–15):** 13–15 all burdens met, opponent's main claims answered
+  … 0–3 burden not attempted.
+
+### 3.2 The "refute a lie" adjustment
+
+Lies are allowed; a *bare* contradiction is not a refutation. When a side
+alleges the opponent stated a falsehood:
+
+- **With a cited source** that contradicts the claim → the opponent loses up
+  to **5 Matter + 3 Clash** points for the fabricated claim.
+- **Without a citation** → the *accuser* loses **3 Clash** points (bare
+  denial doesn't count).
+
+### 3.3 Combining into the verdict
+
+The five categories sum to each side's 0–100 total; the higher total wins.
+The Parent maps the rubric output to the verdict JSON
+(`pro_score`, `con_score`, `winner`, `rationale`, `persuasion_notes`), and
+`persuasion_notes` must name at least one of the five judging principles.
+
+### 3.4 No ties — tie-break order
+
+Scores **must differ**. If raw totals tie, break in order:
+
+1. Higher **Clash** score wins.
+2. Else, fewer **dropped claims** wins.
+3. Else, the side that opened more new lines wins.
+4. Last resort: +1 to the side judged stronger on the opening ping
+   (documented in `persuasion_notes`).
+
+The code-side fallback (`agents/verdict_builder.py`) also bumps the stated
+winner by 1 if the model ever emits equal scores, so a tie can never reach
+the output (see KNOWN_LIMITATIONS L-08).
 
 ## 4. Skill architecture for the Parent
 

@@ -57,6 +57,7 @@ class LlmClient:
         gemini_model: str = "gemini-2.5-flash",
         gemini_fallback_models: tuple[str, ...] = (),
         use_google_search: bool = False,
+        anthropic_web_search: bool = False,
     ) -> None:
         self._timeout = timeout_seconds
         self._gemini_model = gemini_model
@@ -66,6 +67,7 @@ class LlmClient:
             cli_command=cli_command,
             workdir=workdir,
             timeout_seconds=timeout_seconds,
+            web_search=anthropic_web_search,
         )
         self._gemini: GeminiAgentClient | None = None
 

@@ -87,6 +87,7 @@ def _build_app_config(
             gemini_model=llm_raw["gemini_model"],
             gemini_model_fallbacks=tuple(fallbacks),
             use_google_search=bool(llm_raw.get("use_google_search", False)),
+            anthropic_web_search=bool(llm_raw.get("anthropic_web_search", False)),
         ),
         agents=AgentsConfig(**setup["agents"]),
         ipc=IpcConfig(**setup["ipc"]),

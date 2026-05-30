@@ -52,6 +52,13 @@ def test_turn_prompt_closing_phase():
     assert "closing" in text and "crystallize" in text
 
 
+def test_turn_prompt_includes_judge_correction():
+    warning = "RINGSIDE WARNING from the JUDGE: hold your side."
+    text = turn_prompt(3, "A", "B", "prev", pings=10, correction=warning)
+    assert warning in text
+    assert text.index(warning) < text.index("Ping 3")
+
+
 def _llm_json(text: str = "Our side wins.") -> str:
     return (
         f'{{"text": "{text}", "citations": [{{"title": "Source", "url": "https://example.com"}}]}}'

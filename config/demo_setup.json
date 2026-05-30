@@ -16,7 +16,8 @@
       "gemini-2.0-flash-lite",
       "gemini-1.5-flash"
     ],
-    "use_google_search": true
+    "use_google_search": true,
+    "anthropic_web_search": true
   },
   "agents": {
     "cli_command": "claude",

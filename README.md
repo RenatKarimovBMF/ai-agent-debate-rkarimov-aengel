@@ -38,6 +38,7 @@
 - [Optional GUI](#optional-gui)
 - [Screenshots](#screenshots)
 - [API usage & cost](#api-usage--cost)
+- [Research & analysis](#research--analysis)
 - [For graders & reviewers](#for-graders--reviewers)
 - [Project layout](#project-layout)
 - [Submission](#submission-pairs)
@@ -51,12 +52,15 @@
 - **Runtime side assignment** — the Parent assigns sides per session, seeded by the session id, so they vary across runs and are never hardcoded.
 - **Topic-agnostic engine** — ships with the film debate as the default, but runs any motion via `--topic`.
 - **Three LLM providers, auto-selected** — Claude CLI (subscription) → Anthropic API → Gemini (free tier), or force one with `LLM_PROVIDER`.
-- **Research-backed judging** — a WUDC / IDEA / NSDA-derived rubric (Matter · Manner · Method · Clash · Burden) and five judging principles; **no ties allowed**.
+- **Research-backed judging** — a WUDC / IDEA / NSDA-derived rubric (Matter 30 · Clash 25 · Manner 15 · Method 15 · Burden 15 = 100) and five judging principles; **no ties allowed**. Full scoring system: [docs/PRD_judge_rubric.md §3](docs/PRD_judge_rubric.md).
 - **Refute-with-citation rule** — lies are permitted, but a bare contradiction is not a refutation; alleging a falsehood requires a cited source in the same turn.
+- **Judge mid-debate intervention** — after each turn the Parent runs an anti-capitulation check; if a debater is being swept into agreement it issues a ringside warning and re-requests the turn, so the clash never collapses.
+- **Web-search grounding on every provider** — Claude CLI's built-in WebSearch, Gemini's Google Search grounding (`use_google_search`), and Anthropic's managed `web_search` tool (`anthropic_web_search`) — all config-driven.
 - **Project-local Agent Skills** — six skills under `.claude/skills/`, loaded natively by the Claude CLI and injected into the prompt for the API providers.
 - **Gatekeeper + structured logging** — config-driven rate/budget limits; rotating JSONL logs and a machine-readable JSON verdict.
+- **Research & analysis layer** — a tested `debate.analysis` module plus `notebooks/analysis.ipynb` chart win-rate by corner, verdict margins, and citations per turn from real run logs (`uv sync --extra analysis`).
 - **Fully config-driven** — every knob lives in versioned JSON; the version is validated against the code at load.
-- **Strong quality bar** — genuine **100% test coverage** (266 tests), `ruff` + `mypy` clean, every `.py` ≤ 150 lines, CI on Python 3.11–3.13.
+- **Strong quality bar** — genuine **100% test coverage** (281 tests), `ruff` + `mypy` clean, every `.py` ≤ 150 lines, CI on Python 3.11–3.13.
 
 ---
 
@@ -232,6 +236,24 @@ See [assets/screenshots/README.md](assets/screenshots/README.md).
 
 **Token estimate (Gemini 2.5 Flash + search):** roughly **15k–25k tokens** for demo, **35k–55k** for full — depends on turn length and grounding. (The CLI providers don't report token counts; this is a Gemini-only estimate.)
 
+**Per-model cost analysis.** Marginal cost of one **full** debate (~21 calls; ~35k input + ~15k output tokens from the estimate above). Figures are **approximate provider list prices as of 2026-05** — check each provider's pricing page for current rates:
+
+| Provider / model | Input ($/M tok) | Output ($/M tok) | Web search | Est. cost / full debate |
+|------------------|----------------:|-----------------:|------------|------------------------:|
+| **Claude Pro/Max via CLI** (recommended) | — | — | included in plan | **$0 marginal** (counts against the $20/mo plan) |
+| Anthropic API — Claude Sonnet | ~$3 | ~$15 | ~$10 / 1k searches | **~$0.35–0.60** |
+| Gemini 2.5 Flash (paid) | ~$0.30 | ~$2.50 | billed per grounded req | **~$0.05–0.10** |
+| Gemini 2.5 Flash (free tier) | $0 | $0 | $0 | **$0** (≤ ~250 req/day) |
+
+**Optimization strategies** (how this project keeps token cost down):
+
+- **Prefer the Claude subscription** (`claude_cli`) — $0 marginal cost per call.
+- **Demo config** (`demo_setup.json`, 5 pings) roughly halves calls during development.
+- **Gatekeeper** caps total and per-agent requests and enforces a minimum inter-call interval (`config/rate_limits.json`).
+- **JSON-only protocol + 280-word cap** bound output tokens per turn.
+- **One LLM call per turn** (no multi-pass planner/critic) keeps usage predictable.
+- **Skills load natively on the Claude CLI**; only the API providers pay the few-KB prompt-injection overhead (KNOWN_LIMITATIONS L-09).
+
 **Cost & limits.** You can run the project on a paid subscription or for free; the provider is auto-selected (`claude_cli → anthropic → gemini`):
 
 - **Claude Pro/Max subscription (recommended).** A **Claude Pro** plan ($20/month) via `claude_cli` has **no per-call charge** — usage counts against Claude's rolling limits. In our full 10-ping run we used **under 10% of the 5-hour window** and **~1% of the weekly allowance**, so you can comfortably run many debates per month.
@@ -240,6 +262,25 @@ See [assets/screenshots/README.md](assets/screenshots/README.md).
 If you hit a limit: wait and retry, or use `config/demo_setup.json` (5 pings). The course allows reducing 10 → 5 pings — **no grade penalty**.
 
 Gatekeeper settings in `config/rate_limits.json` throttle requests (`min_interval_ms`, `max_total_requests`).
+
+---
+
+## Research & analysis
+
+A thin Jupyter notebook, [`notebooks/analysis.ipynb`](notebooks/analysis.ipynb), turns saved run artifacts (`examples/` + `logs/`) into charts. All parsing/aggregation lives in the unit-tested `debate.analysis` module, so the notebook only loads and plots.
+
+```powershell
+uv sync --extra analysis
+uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
+```
+
+It answers three research questions — **side bias** (does the runtime-assigned corner win evenly?), **verdict margin** (how decisive are rounds?), and **evidence discipline** (citations per turn by role) — and documents an OAT sensitivity sweep over `pings_per_side`. Generated figures land in `results/`:
+
+| Win-rate by corner | Margins & citations |
+|--------------------|---------------------|
+| ![Wins by corner](results/wins_by_corner.png) | ![Margins and citations](results/margins_and_citations.png) |
+
+Add more runs (each writes a `verdict_<id>.json` + `transcript_<id>.md` to `logs/`) and re-execute the notebook to strengthen the statistics.
 
 ---
 

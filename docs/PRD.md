@@ -83,7 +83,7 @@ Sides are no longer hardcoded to a class — the Parent assigns them at the star
 
 - **FR-15:** All LLM calls go through the **SDK layer** (`sdk.llm_client.LlmClient`).
 - **FR-16:** Provider priority (auto): Claude CLI → Anthropic API → Gemini.
-- **FR-17:** Gemini supports optional **Google Search grounding** for citations (`use_google_search` in config).
+- **FR-17:** Web-search grounding is available on every provider: Gemini **Google Search** (`use_google_search`), Anthropic's managed `web_search` tool (`anthropic_web_search`), and the Claude CLI's built-in WebSearch.
 - **FR-18:** Secrets only in `.env`; repository ships `.env.example` only.
 
 ### 4.6 Gatekeeper and reliability
@@ -110,6 +110,8 @@ Sides are no longer hardcoded to a class — the Parent assigns them at the star
 - **FR-28:** **Refute-with-citation rule.** Both debaters are permitted to lie as a test of persuasion skill. However, a debater who alleges that a factual claim by the opponent is false must include a real cited source in the same turn. A bare contradiction does not count as a refutation and is penalised in the judge's Clash score (see `.claude/skills/debate-judge-rubric`).
 - **FR-30:** **Research-backed judging.** The Parent's rubric and the five judging principles are documented in `docs/PRD_judge_rubric.md` and `.claude/skills/debate-judge-rubric`, drawing on WUDC, IDEA, NSDA and Alfred Snider's published criteria.
 - **FR-31:** **Personalised host opening.** At session start the Parent delivers an individual briefing to each child (boxing-referee protocol: side, opponent, word cap, refute-with-citation rule, signal to start). See `.claude/skills/debate-host-protocol`.
+- **FR-32:** **Judge mid-debate intervention.** After each child turn the Parent runs a deterministic anti-capitulation check (`debate.orchestrator.intervention`); on a whole-position surrender it issues a ringside warning and re-requests the turn once with a correction note. Minor concessions are allowed. See ADR-012.
+- **FR-33:** **Research & analysis (§9).** A tested `debate.analysis` module and `notebooks/analysis.ipynb` aggregate saved verdicts/transcripts into win-rate, margin, and citation visualizations (`uv` extra `analysis`). See PLAN §14.
 
 ---
 

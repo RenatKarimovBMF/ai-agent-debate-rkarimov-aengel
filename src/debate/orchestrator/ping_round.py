@@ -5,10 +5,20 @@ import multiprocessing as mp
 
 from debate.agents import ParentAgent
 from debate.config import AppConfig
-from debate.models import AgentRole
-from debate.orchestrator.commands import relay_message, turn_request
-from debate.orchestrator.events import emit_event, queue_get_or_timeout
-from debate.orchestrator.messages import make_relay, validate_child_message
+from debate.models import AgentRole, DebateMessage
+from debate.orchestrator.commands import relay_message
+from debate.orchestrator.events import emit_event
+from debate.orchestrator.intervention import solicit_turn
+from debate.orchestrator.messages import make_relay
+
+
+def _announce_turn(event_queue: mp.Queue, label: str, message: DebateMessage) -> None:
+    emit_event(event_queue, f"{label} says: {message.payload.text}")
+    if message.payload.citations:
+        emit_event(
+            event_queue,
+            f"{label} sources: " + ", ".join(c.url for c in message.payload.citations),
+        )
 
 
 def run_ping_round(
@@ -31,50 +41,38 @@ def run_ping_round(
 
     emit_event(event_queue, "")
     emit_event(event_queue, f"PING {ping}/{pings} — PARENT asks PRO to argue")
-    parent_to_pro.put(turn_request(ping, last_con))
-
-    raw_pro = queue_get_or_timeout(pro_to_parent, timeout, "PRO response")
-    pro_msg = validate_child_message(
-        raw_pro,
-        expected_sender=AgentRole.PRO,
-        session_id=session_id,
+    pro_msg = solicit_turn(
+        role=AgentRole.PRO,
         ping=ping,
+        opponent_text=last_con,
+        request_queue=parent_to_pro,
+        response_queue=pro_to_parent,
+        session_id=session_id,
+        event_queue=event_queue,
+        timeout=timeout,
     )
-
     parent.record_turn(pro_msg)
     last_pro = pro_msg.payload.text
-
-    emit_event(event_queue, f"PRO says: {last_pro}")
-    if pro_msg.payload.citations:
-        emit_event(
-            event_queue,
-            "PRO sources: " + ", ".join(c.url for c in pro_msg.payload.citations),
-        )
+    _announce_turn(event_queue, "PRO", pro_msg)
 
     emit_event(event_queue, "PARENT: received PRO argument and relays it to CON.")
     parent_to_con.put(relay_message(make_relay(pro_msg, AgentRole.CON).model_dump(mode="json")))
 
     emit_event(event_queue, "")
     emit_event(event_queue, f"PING {ping}/{pings} — PARENT asks CON to respond")
-    parent_to_con.put(turn_request(ping, last_pro))
-
-    raw_con = queue_get_or_timeout(con_to_parent, timeout, "CON response")
-    con_msg = validate_child_message(
-        raw_con,
-        expected_sender=AgentRole.CON,
-        session_id=session_id,
+    con_msg = solicit_turn(
+        role=AgentRole.CON,
         ping=ping,
+        opponent_text=last_pro,
+        request_queue=parent_to_con,
+        response_queue=con_to_parent,
+        session_id=session_id,
+        event_queue=event_queue,
+        timeout=timeout,
     )
-
     parent.record_turn(con_msg)
     last_con = con_msg.payload.text
-
-    emit_event(event_queue, f"CON says: {last_con}")
-    if con_msg.payload.citations:
-        emit_event(
-            event_queue,
-            "CON sources: " + ", ".join(c.url for c in con_msg.payload.citations),
-        )
+    _announce_turn(event_queue, "CON", con_msg)
 
     emit_event(event_queue, "PARENT: received CON counterargument and relays it to PRO.")
     parent_to_pro.put(relay_message(make_relay(con_msg, AgentRole.PRO).model_dump(mode="json")))

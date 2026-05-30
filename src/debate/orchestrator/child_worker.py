@@ -77,6 +77,7 @@ def child_worker(
             if command_type == TURN_REQUEST:
                 ping = int(command["ping"])
                 opponent_text = command.get("opponent_text") or last_opponent_text
+                correction = command.get("correction")
 
                 emit_event(
                     event_queue,
@@ -85,7 +86,7 @@ def child_worker(
                     data={"role": role.value, "ping": ping},
                 )
 
-                message = agent.build_turn(ping, opponent_text)
+                message = agent.build_turn(ping, opponent_text, correction)
                 child_to_parent.put(message.model_dump(mode="json"))
 
                 emit_event(

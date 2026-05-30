@@ -21,6 +21,7 @@ class LlmConfig:
     gemini_model: str
     gemini_model_fallbacks: tuple[str, ...]
     use_google_search: bool
+    anthropic_web_search: bool = False
 
 
 @dataclass(frozen=True)

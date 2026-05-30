@@ -266,6 +266,27 @@ Public agent IPC (Exercise requirement) remains JSON `DebateMessage` / `VerdictM
 **Decision:** `debate._version.__version__ = "1.00"` is the single source of truth; `setup.json`, `demo_setup.json`, `rate_limits.json`, and `demo_rate_limits.json` each carry a top-level `"version"` key. `debate.config.loader._validate_config_version` is called for both files inside `load_config`: missing key is a hard `ValueError`, mismatch is a warning so old configs still boot but the user is told.  
 **Consequences:** Submitted artifacts can be diffed by version at a glance; CI-style mistakes (forgotten config bump) surface immediately at startup.
 
+### ADR-011: Web-search tool on every provider that supports it
+
+**Status:** Accepted  
+**Context:** The exercise mandates real online search so citations are grounded, not invented. Gemini already used Google Search grounding (`use_google_search`); the Claude CLI carries a built-in WebSearch tool; but the direct Anthropic API path returned citations from model memory only.  
+**Decision:** Add a config flag `llm.anthropic_web_search` (default off, on in `setup.json`/`demo_setup.json`) that attaches Anthropic's GA managed `web_search_20250305` tool to API calls. `_extract_text` was added so the response's interleaved tool-use / search-result / text blocks collapse to the final answer.  
+**Consequences:** All three providers can now ground citations in live sources; tests mock the tool path to keep 100% coverage.
+
+### ADR-012: Judge mid-debate intervention (anti-capitulation)
+
+**Status:** Accepted  
+**Context:** The brief warns that agents drift into agreement; the Parent must police this mid-round and "put them back in line," not only score at the end.  
+**Decision:** `orchestrator.intervention.solicit_turn` wraps every turn request: after a child answers, `capitulation_warning` runs a deterministic check for whole-position surrender markers (minor concessions are allowed). On a hit, the Parent emits a ringside-warning event and re-requests the turn once with a `correction` note, threaded through `turn_request → child_worker → build_turn → turn_prompt`.  
+**Consequences:** The Parent visibly enforces contradiction; the check is token-free and unit-tested. A genuinely stubborn capitulation after one warning is left to the verdict's Clash penalty.
+
+### ADR-013: No disk-based session resume (rely on the watchdog)
+
+**Status:** Rejected (won't-do)  
+**Context:** The brief lists an *optional* extension: reconstruct a crashed debate from its saved session files and continue from where it fell.  
+**Decision:** Do **not** build it. In-session resilience is already provided by the `Watchdog`, which keep-alives the workers and restarts a dead agent process mid-run (Exercise §8.6); turns also persist to JSONL + transcript as they happen. A full resume path would duplicate that resilience while adding per-ping state checkpointing, child opponent-context re-seeding, and non-hermetic tests — too much complexity for the marginal benefit, especially since runs are intended to be live and fresh each time.  
+**Consequences:** A wholesale process kill restarts a fresh debate rather than resuming a partial one (acceptable for a live-debate engine). Documented as KNOWN_LIMITATIONS L-11; the JSONL session format keeps the door open if resume is ever wanted.
+
 ---
 
 ## 8. Directory structure (v1.00)
@@ -342,12 +363,46 @@ docs/
 
 ---
 
-## 12. Related documents
+## 13. ISO/IEC 25010 quality mapping
+
+How the project addresses the eight product-quality characteristics of
+ISO/IEC 25010 (Guidelines V3 §13):
+
+| Characteristic | How it is addressed in this project |
+|----------------|-------------------------------------|
+| **Functional suitability** | All Exercise-02 functional requirements (FR-01…FR-31 in `PRD.md`) implemented and traced; verdict always names a winner (no tie). |
+| **Performance efficiency** | Three agents run as real OS processes (`spawn`); per-call timeouts; the Gatekeeper caps request volume to control token cost. |
+| **Compatibility** | Pure-Python `uv` project; runs on Windows (primary) and Linux/macOS; provider-agnostic SDK facade (Claude CLI / Anthropic / Gemini). |
+| **Usability** | Terminal-first UX with `--dry-run`/`--version`; optional Tkinter GUI; README user manual; structured event stream for live progress. |
+| **Reliability** | Watchdog keep-alive + kill/restart; per-call timeouts; JSON-repair retry; judge re-ask on capitulation; graceful degradation to a fallback turn. |
+| **Security** | Secrets only in `.env` (`.env.example` shipped); Gatekeeper as the single cyber chokepoint; placeholder-key detection; `.gitignore` blocks `.env`. |
+| **Maintainability** | ≤150-line modules, single-responsibility packages, 100% test coverage, Ruff + mypy gates, ADRs, and project-local skills. |
+| **Portability** | `pyproject.toml` + `uv.lock` reproduce the environment; relative imports; no absolute paths; config externalized to `config/*.json`. |
+
+---
+
+## 14. Research and results analysis (§9)
+
+- **Module:** `debate.analysis` (unit-tested) parses saved verdict JSONs and
+  transcripts into records and aggregates (win counts by corner, mean verdict
+  margin, citations-per-turn by role).
+- **Notebook:** `notebooks/analysis.ipynb` stays thin — it only loads
+  `examples/` + `logs/` via `debate.analysis` and plots. Charts are written to
+  `results/`.
+- **Sensitivity analysis:** the notebook documents an OAT sweep (vary
+  `pings_per_side`, hold topic fixed, run N sessions) to study whether longer
+  debates yield more decisive margins. Install with `uv sync --extra analysis`.
+
+---
+
+## 15. Related documents
 
 | Document | Description |
 |----------|-------------|
 | `PRD.md` | Product requirements |
 | `TODO.md` | Staged task tracker |
+| `DECISIONS.md` | Chronological decision journal (continuity aid) |
+| `KNOWN_LIMITATIONS.md` | Deliberate design-choice limitations |
 | `PROMPTS.md` | Prompt book — every LLM-facing prompt, rationale, iteration history |
 | `PRD_orchestrator.md` | Orchestrator mechanism spec |
 | `PRD_gatekeeper.md` | Gatekeeper mechanism spec |

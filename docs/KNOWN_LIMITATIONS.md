@@ -134,6 +134,26 @@ architecture the assignment asks for.
   one-line change. To trim tokens, inject a condensed summary per skill
   instead of the full body.
 
+## L-11: No disk-based session *resume* (by design — the watchdog covers it)
+
+- **Description:** the optional "reload a crashed/aborted debate from its
+  saved session files and continue from the ping it died on" extension is
+  **intentionally not implemented**. The project recovers from process
+  failure a different way: the `Watchdog` (`debate/watchdog.py`) runs a
+  keep-alive loop and **automatically restarts a dead agent worker
+  mid-session** (Exercise §8.6), and every turn already streams to rotating
+  JSONL logs + a verbatim transcript.
+- **Impact:** if the *whole* run is killed (e.g. the machine is shut down),
+  re-running starts a fresh debate rather than resuming the partial one.
+  Because runs are meant to be live and non-deterministic, a fresh debate is
+  an acceptable — arguably preferable — outcome.
+- **Workaround / rationale:** a true resume feature would duplicate the
+  watchdog's in-session resilience while adding real complexity (per-ping
+  state checkpointing, re-seeding the child processes' opponent context, and
+  new non-hermetic tests). We judged the marginal benefit too low to justify
+  it. See ADR-013. The saved JSONL session format would make it feasible as
+  a future extension if ever needed.
+
 ## L-10: Free-tier Gemini produces lower-fidelity debates
 
 - **Description:** the auto provider priority is

@@ -23,6 +23,27 @@ def test_claude_prompt_api_success(monkeypatch):
     assert result.text == "hello"
 
 
+def test_claude_prompt_api_web_search_adds_tool_and_joins_text(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-key")
+
+    client = ClaudeAgentClient(web_search=True)
+    mock_anthropic = MagicMock()
+    tool_block = MagicMock()
+    tool_block.text = 123  # non-string -> skipped by _extract_text
+    text_block = MagicMock()
+    text_block.text = "grounded answer"
+    mock_message = MagicMock()
+    mock_message.content = [tool_block, text_block]
+    mock_anthropic.messages.create.return_value = mock_message
+
+    with patch("anthropic.Anthropic", return_value=mock_anthropic):
+        result = client.prompt_api("system", "user")
+
+    assert result.text == "grounded answer"
+    _, kwargs = mock_anthropic.messages.create.call_args
+    assert kwargs["tools"] == [{"type": "web_search_20250305", "name": "web_search"}]
+
+
 def test_claude_prompt_cli_success():
     client = ClaudeAgentClient(cli_command="claude")
 

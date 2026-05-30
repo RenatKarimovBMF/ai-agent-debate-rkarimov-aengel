@@ -24,7 +24,7 @@ class _FakeAgent:
     def apply_assignment(self, assigned: str, opponent: str) -> None:
         self.assignment = (assigned, opponent)
 
-    def build_turn(self, ping: int, opponent_text: str | None):
+    def build_turn(self, ping: int, opponent_text: str | None, correction=None):
         self.turns.append((ping, opponent_text))
         return make_message(ping=ping)
 

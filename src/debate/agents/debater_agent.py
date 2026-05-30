@@ -45,7 +45,12 @@ class DebaterAgent(BaseAgent):
         )
         return base + self.skill_suffix()
 
-    def build_turn(self, ping: int, opponent_text: str | None) -> DebateMessage:
+    def build_turn(
+        self,
+        ping: int,
+        opponent_text: str | None,
+        correction: str | None = None,
+    ) -> DebateMessage:
         own_side, opponent_side = self._resolved_sides()
         prompt = turn_prompt(
             ping=ping,
@@ -53,6 +58,7 @@ class DebaterAgent(BaseAgent):
             opponent_side=opponent_side,
             opponent_text=opponent_text,
             pings=self.config.debate.pings_per_side,
+            correction=correction,
         )
 
         payload = invoke_and_parse_debate_payload_with_retry(

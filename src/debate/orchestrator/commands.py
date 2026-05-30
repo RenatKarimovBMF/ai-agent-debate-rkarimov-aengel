@@ -8,11 +8,16 @@ ASSIGN = "ASSIGN"
 ERROR = "ERROR"
 
 
-def turn_request(ping: int, opponent_text: str | None) -> dict[str, object]:
+def turn_request(
+    ping: int,
+    opponent_text: str | None,
+    correction: str | None = None,
+) -> dict[str, object]:
     return {
         "type": TURN_REQUEST,
         "ping": ping,
         "opponent_text": opponent_text,
+        "correction": correction,
     }
 
 

@@ -27,6 +27,7 @@ def make_llm_client(config: AppConfig) -> LlmClient:
         gemini_model=config.llm.gemini_model,
         gemini_fallback_models=config.llm.gemini_model_fallbacks,
         use_google_search=config.llm.use_google_search,
+        anthropic_web_search=config.llm.anthropic_web_search,
     )
 
 

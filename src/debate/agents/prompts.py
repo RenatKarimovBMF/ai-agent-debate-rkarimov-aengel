@@ -79,7 +79,9 @@ def turn_prompt(
     opponent_side: str,
     opponent_text: str | None,
     pings: int = 10,
+    correction: str | None = None,
 ) -> str:
+    correction_part = f"{correction}\n\n" if correction else ""
     if opponent_text:
         opponent_part = (
             f"Opponent ({opponent_side}) last said:\n{opponent_text}\n\n"
@@ -98,7 +100,7 @@ def turn_prompt(
         )
 
     return f"""
-Ping {ping} of {pings}. Argue for {own_side}.
+{correction_part}Ping {ping} of {pings}. Argue for {own_side}.
 
 {opponent_part}
 
